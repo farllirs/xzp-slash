@@ -1,0 +1,16 @@
+Origin: xzp-slash Repository
+Label: xzp-slash
+Suite: stable
+Codename: xzp-slash
+Architectures: all amd64
+Components: main
+Description: Official repository for xzp-slash
+MD5Sum:
+ aca931ff14c8075eed39079509fc232c              641 Packages
+ e13ab593cb20fb7162ce321595a227ef              446 Packages.gz
+SHA1:
+ 481e058eaa10f52efd88ab4a09fb05d3c833023d              641 Packages
+ 4bbcfdb9dbd83abe1b3566ab0760f295366cc5e8              446 Packages.gz
+SHA256:
+ 4b1ba25bda9b1df2b52d1bd371a32633cc28f166288ae7f914bf52849b471518              641 Packages
+ 42f09d72fba7e5d3548569418b9564d3075c2734394993ad08c94abdeb73931e              446 Packages.gz

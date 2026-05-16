@@ -1,0 +1,19 @@
+Package: xzp-slash
+Version: 1.0.0
+Architecture: all
+Maintainer: xzp-slash Developer <dev@xzp-slash.com>
+Installed-Size: 220
+Depends: fzf, jq, python3, bash
+Filename: ./xzp-slash.deb
+Size: 150034
+MD5sum: c1d4f23e3b865de8964687ee8fd8a964
+SHA1: 3d0e4a381ee97626a3e9c47ce7a58e65083b9bbb
+SHA256: 798de66248e3a96ec5ae3821ec9cfb26c1ecbec4ffe2e7a0dca0f13a5e839a1a
+Section: utils
+Priority: optional
+Homepage: https://github.com/xzp-slash/xzp-slash
+Description: Command launcher for CLI
+ xzp-slash is a powerful command launcher and utility for terminal users,
+ featuring contextual commands, package manager integration, and a
+ visual task manager.
+
