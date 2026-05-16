@@ -46,3 +46,20 @@ jobs:
           prerelease: false
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Setup APT Repository for GitHub Pages
+        run: |
+          mkdir -p repo
+          cp xzp-slash.deb repo/
+          cd repo
+          sudo apt-get install -y dpkg-dev
+          bash ../scripts/update-repo.sh
+          # Add a simple index.html for the repo
+          echo "<html><body><h1>xzp-slash APT Repository</h1><p>Add this to your sources: deb [trusted=yes] https://${{ github.repository_owner }}.github.io/${{ github.event.repository.name }}/ ./</p></body></html>" > index.html
+
+      - name: Deploy to GitHub Pages
+        uses: peaceiris/actions-gh-pages@v3
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: ./repo
+          force_orphan: true
