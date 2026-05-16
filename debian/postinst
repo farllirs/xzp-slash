@@ -1,0 +1,26 @@
+#!/bin/sh
+set -e
+
+if [ "$1" = "configure" ]; then
+    echo ""
+    echo "================================================================="
+    echo " xzp-slash has been installed!"
+    echo ""
+    echo " To enable the widgets in your shell, add the following line to"
+    echo " your shell configuration file:"
+    echo ""
+    echo " For Bash (~/.bashrc):"
+    echo "   source /usr/share/slash/completions/bash_widget.sh"
+    echo ""
+    echo " For Zsh (~/.zshrc):"
+    echo "   source /usr/share/slash/completions/zsh_widget.zsh"
+    echo "   source /usr/share/slash/completions/pkg_completion.zsh"
+    echo ""
+    echo " Then restart your shell or run 'source ~/.bashrc' (or ~/.zshrc)."
+    echo "================================================================="
+    echo ""
+fi
+
+#DEBHELPER#
+
+exit 0

@@ -1,0 +1,15 @@
+Source: xzp-slash
+Section: utils
+Priority: optional
+Maintainer: xzp-slash Developer <dev@xzp-slash.com>
+Build-Depends: debhelper-compat (= 13)
+Standards-Version: 4.5.0
+Homepage: https://github.com/xzp-slash/xzp-slash
+
+Package: xzp-slash
+Architecture: all
+Depends: ${misc:Depends}, fzf, jq, python3, bash
+Description: Command launcher for CLI
+ xzp-slash is a powerful command launcher and utility for terminal users,
+ featuring contextual commands, package manager integration, and a
+ visual task manager.

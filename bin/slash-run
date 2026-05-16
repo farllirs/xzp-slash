@@ -1,0 +1,38 @@
+#!/usr/bin/env bash
+# slash-run — wrapper que lanza slash y aplica el modo de ejecución
+# Uso: source este archivo o llámalo desde el widget
+
+# Resolve paths
+SELF_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+if [[ -f "$SELF_DIR/../lib/slash-env.sh" ]]; then
+    source "$SELF_DIR/../lib/slash-env.sh"
+elif [[ -f "/usr/lib/slash/slash-env.sh" ]]; then
+    source "/usr/lib/slash/slash-env.sh"
+elif [[ -f "/data/data/com.termux/files/usr/lib/slash/slash-env.sh" ]]; then
+    source "/data/data/com.termux/files/usr/lib/slash/slash-env.sh"
+else
+    echo "Error: slash-env.sh not found."
+    exit 1
+fi
+
+CMD_OUT="${TMPDIR:-/tmp}/slash_cmd_result"
+MODE_OUT="${TMPDIR:-/tmp}/slash_mode_result"
+
+# Lanzar el menú (necesita TTY)
+"$SLASH_BIN/slash" </dev/tty >/dev/tty
+EXIT=$?
+
+[[ $EXIT -ne 0 ]] && return 2>/dev/null || exit 0
+
+CMD=$(cat "$CMD_OUT" 2>/dev/null)
+MODE=$(cat "$MODE_OUT" 2>/dev/null)
+[[ -z "$CMD" ]] && return 2>/dev/null || exit 0
+
+case "$MODE" in
+    2)  # Auto-execute: ejecutar directamente
+        eval "$CMD"
+        ;;
+    *)  # Paste (modo 1 y 3): imprimir para que el widget lo pegue en el buffer
+        echo "$CMD"
+        ;;
+esac

@@ -1,0 +1,45 @@
+name: Build and Release .deb
+
+on:
+  push:
+    tags:
+      - 'v*'
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Install build dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y debhelper devscripts build-essential fakeroot
+
+      - name: Build Debian package
+        run: |
+          # The -b flag builds only the binary package
+          # The -us -uc flags skip signing
+          dpkg-buildpackage -us -uc -b -rfakeroot
+
+      - name: Find and Rename package
+        run: |
+          # Find the generated .deb file in the parent directory and move it here
+          DEB_FILE=$(find .. -name "xzp-slash_*.deb" | head -n 1)
+          if [ -z "$DEB_FILE" ]; then
+            echo "Error: .deb file not found"
+            exit 1
+          fi
+          mv "$DEB_FILE" xzp-slash.deb
+
+      - name: Create Release
+        id: create_release
+        uses: softprops/action-gh-release@v1
+        with:
+          files: xzp-slash.deb
+          name: Release ${{ github.ref_name }}
+          draft: false
+          prerelease: false
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

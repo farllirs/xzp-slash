@@ -1,0 +1,46 @@
+#!/usr/bin/env bash
+
+# --- Diagnóstico de Entorno para xzp-slash ---
+# Resolve paths
+SELF_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+if [[ -f "$SELF_DIR/../lib/slash-env.sh" ]]; then
+    source "$SELF_DIR/../lib/slash-env.sh"
+elif [[ -f "/usr/lib/slash/slash-env.sh" ]]; then
+    source "/usr/lib/slash/slash-env.sh"
+elif [[ -f "/data/data/com.termux/files/usr/lib/slash/slash-env.sh" ]]; then
+    source "/data/data/com.termux/files/usr/lib/slash/slash-env.sh"
+else
+    echo "Error: slash-env.sh not found."
+    exit 1
+fi
+
+# Usar herramientas del registry + extras de sistema
+mapfile -t TOOLS < <(jq -r 'keys[]' "$TOOL_REGISTRY" 2>/dev/null)
+TOOLS+=(node yarn clang gcc rustc zsh tree zip unzip openssh)
+
+echo -e "\033[1;36mxzp-slash | Diagnóstico de Herramientas\033[0m"
+echo "------------------------------------------------"
+
+INSTALLED=(); MISSING=()
+for tool in "${TOOLS[@]}"; do
+    if command -v "$tool" >/dev/null 2>&1; then
+        echo -e "\033[1;32m✓\033[0m $tool"
+        INSTALLED+=("$tool")
+    else
+        echo -e "\033[1;31m✗\033[0m $tool"
+        MISSING+=("$tool")
+    fi
+done
+
+echo "------------------------------------------------"
+echo -e "Instalados: \033[1;32m${#INSTALLED[@]}\033[0m  |  Faltantes: \033[1;31m${#MISSING[@]}\033[0m"
+
+echo -e "\n\033[1;36mVariables de Entorno\033[0m"
+for p in "$HOME/.npm-global/bin" "$HOME/.cargo/bin" "$HOME/.local/bin"; do
+    [[ ! -d "$p" ]] && continue
+    if [[ ":$PATH:" == *":$p:"* ]]; then
+        echo -e "\033[1;32m✓\033[0m $p"
+    else
+        echo -e "\033[1;31m✗\033[0m $p \033[1;33m(no está en PATH)\033[0m"
+    fi
+done

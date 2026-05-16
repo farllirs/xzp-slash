@@ -1,0 +1,27 @@
+#!/usr/bin/env bash
+
+# --- Administrador de Tareas para xzp-slash ---
+
+get_processes() {
+    ps -e -o pid,user,vsz,rss,comm | awk '
+    NR == 1 { print "\033[1;36m" $1, $2, "VSZ", "RSS", $5 "\033[0m"; next }
+    { printf "\033[1;32m%7s\033[0m %-8s %8s %8.1fMB %s\n", $1, $2, $3, $4/1024, $5 }'
+}
+
+export -f get_processes
+
+SELECTED=$(get_processes | fzf \
+    --ansi \
+    --header-lines=1 \
+    --prompt="Procesos / " \
+    --header="ENTER: Ver Detalle | CTRL-X: Matar | CTRL-R: Refrescar" \
+    --layout=reverse --height=80% --border \
+    --bind "ctrl-r:reload(get_processes)" \
+    --bind "ctrl-x:execute(kill -9 {1})+reload(get_processes)" \
+    --preview "ps -p {1} -o pid,user,vsz,rss,stat,start,time,comm" \
+    --preview-window=bottom:5:wrap)
+
+if [[ -n "$SELECTED" ]]; then
+    PID=$(echo "$SELECTED" | awk '{print $1}')
+    ps -p "$PID" -f
+fi

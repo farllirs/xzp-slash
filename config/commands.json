@@ -1,0 +1,112 @@
+{
+  "global": [
+    {"cmd": "slash-task", "desc": "Administrador de tareas visual (Procesos, PID, RAM)"},
+    {"cmd": "slash-health", "desc": "Diagnóstico de herramientas y variables del sistema"},
+    {"cmd": "find . -type f -name \"*\" | xargs grep -i \"\"", "desc": "Buscar texto dentro de archivos recursivamente"},
+    {"cmd": "tar -cvzf archive.tar.gz <folder>", "desc": "Comprimir carpeta en formato tar.gz"},
+    {"cmd": "ssh <user>@<host> -p 22", "desc": "Conexión segura a servidor remoto"},
+    {"cmd": "rsync -avzP <source> <dest>", "desc": "Sincronización avanzada de archivos con progreso"},
+    {"cmd": "sed -i 's/old/new/g' <file>", "desc": "Reemplazar texto en un archivo de forma masiva"},
+    {"cmd": "du -sh * | sort -h", "desc": "Ver tamaño de archivos y carpetas ordenados"},
+    {"cmd": "ss -tulnp", "desc": "Ver puertos abiertos y procesos asociados"},
+    {"cmd": "ls -laF", "desc": "Listado detallado con tipos de archivo"},
+    {"cmd": "cd <path>", "desc": "Cambiar de directorio"},
+    {"cmd": "nano <file>", "desc": "Editor de texto rápido en terminal"},
+    {"cmd": "top", "desc": "Monitor de recursos del sistema en tiempo real"},
+    {"cmd": "cp -rv <src> <dest>", "desc": "Copiar archivos o carpetas recursivamente"},
+    {"cmd": "mv <src> <dest>", "desc": "Mover o renombrar archivos/carpetas"},
+    {"cmd": "rm -rf <path>", "desc": "Eliminar archivos o carpetas recursivamente (CUIDADO)"},
+    {"cmd": "mkdir -p <path>", "desc": "Crear carpetas y sus padres si no existen"}
+  ],
+  "contextual": {
+    "git": [
+      {"cmd": "git commit -am \"<message>\"", "desc": "Añadir cambios y crear commit con mensaje"},
+      {"cmd": "git checkout -b <new_branch>", "desc": "Crear y cambiar a una nueva rama"},
+      {"cmd": "git remote add origin <url>", "desc": "Vincular el repositorio local con uno remoto"},
+      {"cmd": "git log --author=\"<name>\" --oneline", "desc": "Filtrar historial de commits por autor"},
+      {"cmd": "git diff --staged", "desc": "Ver cambios listos para el commit"}
+    ],
+    "node": [
+      {"cmd": "npm init -y", "desc": "Inicializar proyecto con valores por defecto"},
+      {"cmd": "npm install --save-dev <package>", "desc": "Instalar dependencia de desarrollo"},
+      {"cmd": "npm publish --access public", "desc": "Publicar paquete en NPM"},
+      {"cmd": "node --inspect-brk <file>.js", "desc": "Depurar script Node.js paso a paso"},
+      {"cmd": "npm run build", "desc": "Ejecutar el script de construcción"}
+    ],
+    "python": [
+      {"cmd": "python3 -m unittest discover -v", "desc": "Descubrir y ejecutar todos los tests unitarios"},
+      {"cmd": "pip install --upgrade pip setuptools wheel", "desc": "Actualizar herramientas base de empaquetado"},
+      {"cmd": "python3 <file>.py --help", "desc": "Ejecutar script con bandera de ayuda"},
+      {"cmd": "black <folder> --line-length 88", "desc": "Formatear código Python automáticamente"},
+      {"cmd": "pip install -r requirements.txt", "desc": "Instalar dependencias desde requirements.txt"}
+    ],
+    "rust": [
+      {"cmd": "cargo build --release", "desc": "Compilar en modo release"},
+      {"cmd": "cargo run", "desc": "Compilar y ejecutar el binario"},
+      {"cmd": "cargo test", "desc": "Ejecutar todos los tests"},
+      {"cmd": "cargo check", "desc": "Verificar código sin compilar"},
+      {"cmd": "cargo update", "desc": "Actualizar dependencias en Cargo.lock"}
+    ],
+    "cpp": [
+      {"cmd": "make -j$(nproc)", "desc": "Compilar usando todos los núcleos disponibles"},
+      {"cmd": "cmake -B build -S . && cmake --build build", "desc": "Configurar y compilar con CMake"},
+      {"cmd": "g++ -O3 -Wall -Wextra main.cpp -o app", "desc": "Compilación rápida con optimización y advertencias"},
+      {"cmd": "valgrind --leak-check=full ./app", "desc": "Analizar fugas de memoria con Valgrind"}
+    ],
+    "docker": [
+      {"cmd": "docker compose up -d", "desc": "Levantar contenedores en segundo plano"},
+      {"cmd": "docker ps --format \"table {{.ID}}\\t{{.Names}}\\t{{.Status}}\"", "desc": "Listar contenedores activos con formato limpio"},
+      {"cmd": "docker exec -it <container_id> /bin/bash", "desc": "Entrar en la terminal de un contenedor activo"},
+      {"cmd": "docker system prune -a --volumes", "desc": "Limpiar todo el sistema Docker"}
+    ],
+    "gh": [
+      {"cmd": "gh auth login", "desc": "Autenticarse en GitHub CLI"},
+      {"cmd": "gh repo clone <repo>", "desc": "Clonar un repositorio de GitHub"},
+      {"cmd": "gh pr list", "desc": "Listar pull requests abiertos en el repo actual"}
+    ],
+    "arch": [
+      {"cmd": "pacman -Syu", "desc": "Actualizar todos los paquetes del sistema"},
+      {"cmd": "pacman -S <package>", "desc": "Instalar un paquete"},
+      {"cmd": "pacman -Rs <package>", "desc": "Desinstalar paquete y sus dependencias huérfanas"},
+      {"cmd": "pacman -Ss <query>", "desc": "Buscar paquetes en los repositorios"},
+      {"cmd": "pacman -Qs <query>", "desc": "Buscar entre paquetes instalados"},
+      {"cmd": "pacman -Sc", "desc": "Limpiar caché de paquetes descargados"},
+      {"cmd": "pacman -Qdt", "desc": "Listar paquetes huérfanos (sin dependientes)"},
+      {"cmd": "systemctl status <service>", "desc": "Ver estado de un servicio systemd"},
+      {"cmd": "systemctl enable --now <service>", "desc": "Habilitar e iniciar un servicio"},
+      {"cmd": "journalctl -xe", "desc": "Ver logs del sistema con contexto de errores"}
+    ],
+    "debian": [
+      {"cmd": "apt update && apt upgrade -y", "desc": "Actualizar lista de paquetes y sistema"},
+      {"cmd": "apt install <package>", "desc": "Instalar un paquete"},
+      {"cmd": "apt remove --purge <package>", "desc": "Desinstalar paquete y sus archivos de configuración"},
+      {"cmd": "apt search <query>", "desc": "Buscar paquetes disponibles"},
+      {"cmd": "apt autoremove", "desc": "Eliminar paquetes huérfanos"},
+      {"cmd": "dpkg -l | grep <query>", "desc": "Listar paquetes instalados que coincidan"},
+      {"cmd": "systemctl status <service>", "desc": "Ver estado de un servicio systemd"},
+      {"cmd": "journalctl -xe", "desc": "Ver logs del sistema con contexto de errores"}
+    ],
+    "fedora": [
+      {"cmd": "dnf update -y", "desc": "Actualizar todos los paquetes del sistema"},
+      {"cmd": "dnf install <package>", "desc": "Instalar un paquete"},
+      {"cmd": "dnf remove <package>", "desc": "Desinstalar un paquete"},
+      {"cmd": "dnf search <query>", "desc": "Buscar paquetes disponibles"},
+      {"cmd": "dnf autoremove", "desc": "Eliminar paquetes huérfanos"},
+      {"cmd": "systemctl status <service>", "desc": "Ver estado de un servicio systemd"},
+      {"cmd": "journalctl -xe", "desc": "Ver logs del sistema con contexto de errores"}
+    ],
+    "alpine": [
+      {"cmd": "apk update && apk upgrade", "desc": "Actualizar índice y paquetes"},
+      {"cmd": "apk add <package>", "desc": "Instalar un paquete"},
+      {"cmd": "apk del <package>", "desc": "Desinstalar un paquete"},
+      {"cmd": "apk search <query>", "desc": "Buscar paquetes disponibles"},
+      {"cmd": "apk info <package>", "desc": "Ver información de un paquete instalado"}
+    ],
+    "termux": [
+      {"cmd": "pkg update && pkg upgrade", "desc": "Actualizar todos los paquetes de Termux"},
+      {"cmd": "termux-setup-storage", "desc": "Conceder permiso de acceso al almacenamiento"},
+      {"cmd": "termux-change-repo", "desc": "Cambiar mirrors de los repositorios de Termux"},
+      {"cmd": "pkg install openssh", "desc": "Instalar servidor y cliente SSH"}
+    ]
+  }
+}

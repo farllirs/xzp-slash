@@ -1,0 +1,242 @@
+{
+  "git":      [
+    {"cmd": "git status", "desc": "Ver estado del repositorio"},
+    {"cmd": "git commit -am \"<message>\"", "desc": "Commit rápido con mensaje"},
+    {"cmd": "git checkout -b <branch>", "desc": "Crear y cambiar a nueva rama"},
+    {"cmd": "git log --oneline --graph --all", "desc": "Historial visual de ramas"},
+    {"cmd": "git diff --staged", "desc": "Ver cambios listos para commit"},
+    {"cmd": "git stash", "desc": "Guardar cambios sin commitear"},
+    {"cmd": "git rebase -i HEAD~<n>", "desc": "Rebase interactivo de los últimos N commits"}
+  ],
+  "gh":       [
+    {"cmd": "gh pr create --fill", "desc": "Crear PR con título y descripción del commit"},
+    {"cmd": "gh pr list", "desc": "Listar pull requests abiertos"},
+    {"cmd": "gh repo clone <repo>", "desc": "Clonar repositorio de GitHub"},
+    {"cmd": "gh issue list", "desc": "Listar issues abiertos"},
+    {"cmd": "gh run list", "desc": "Ver ejecuciones de GitHub Actions"}
+  ],
+  "docker":   [
+    {"cmd": "docker compose up -d", "desc": "Levantar contenedores en segundo plano"},
+    {"cmd": "docker compose down", "desc": "Detener y eliminar contenedores"},
+    {"cmd": "docker ps -a", "desc": "Listar todos los contenedores"},
+    {"cmd": "docker exec -it <container> /bin/bash", "desc": "Entrar en terminal de contenedor"},
+    {"cmd": "docker logs -f <container>", "desc": "Ver logs en tiempo real"},
+    {"cmd": "docker system prune -a", "desc": "Limpiar imágenes y contenedores no usados"},
+    {"cmd": "docker build -t <name> .", "desc": "Construir imagen desde Dockerfile"}
+  ],
+  "kubectl":  [
+    {"cmd": "kubectl get pods -A", "desc": "Listar todos los pods en todos los namespaces"},
+    {"cmd": "kubectl logs -f <pod>", "desc": "Ver logs de un pod en tiempo real"},
+    {"cmd": "kubectl exec -it <pod> -- /bin/bash", "desc": "Entrar en terminal de un pod"},
+    {"cmd": "kubectl apply -f <file>.yaml", "desc": "Aplicar configuración desde archivo"},
+    {"cmd": "kubectl delete pod <pod>", "desc": "Eliminar un pod (se reinicia si tiene deployment"},
+    {"cmd": "kubectl describe pod <pod>", "desc": "Ver detalles y eventos de un pod"}
+  ],
+  "terraform": [
+    {"cmd": "terraform init", "desc": "Inicializar directorio de trabajo"},
+    {"cmd": "terraform plan", "desc": "Previsualizar cambios de infraestructura"},
+    {"cmd": "terraform apply -auto-approve", "desc": "Aplicar cambios sin confirmación"},
+    {"cmd": "terraform destroy", "desc": "Destruir toda la infraestructura gestionada"},
+    {"cmd": "terraform fmt -recursive", "desc": "Formatear todos los archivos .tf"}
+  ],
+  "ansible":  [
+    {"cmd": "ansible-playbook <playbook>.yml -i inventory", "desc": "Ejecutar playbook"},
+    {"cmd": "ansible all -m ping -i inventory", "desc": "Verificar conectividad con todos los hosts"},
+    {"cmd": "ansible-vault encrypt <file>", "desc": "Cifrar archivo con Ansible Vault"}
+  ],
+  "npm":      [
+    {"cmd": "npm install", "desc": "Instalar dependencias del proyecto"},
+    {"cmd": "npm run dev", "desc": "Iniciar servidor de desarrollo"},
+    {"cmd": "npm run build", "desc": "Construir para producción"},
+    {"cmd": "npm run test", "desc": "Ejecutar tests"},
+    {"cmd": "npm outdated", "desc": "Ver dependencias desactualizadas"},
+    {"cmd": "npm audit fix", "desc": "Corregir vulnerabilidades automáticamente"}
+  ],
+  "pnpm":     [
+    {"cmd": "pnpm install", "desc": "Instalar dependencias"},
+    {"cmd": "pnpm dev", "desc": "Iniciar servidor de desarrollo"},
+    {"cmd": "pnpm build", "desc": "Construir para producción"},
+    {"cmd": "pnpm add <package>", "desc": "Añadir dependencia"},
+    {"cmd": "pnpm add -D <package>", "desc": "Añadir dependencia de desarrollo"}
+  ],
+  "bun":      [
+    {"cmd": "bun install", "desc": "Instalar dependencias (ultra rápido)"},
+    {"cmd": "bun run dev", "desc": "Iniciar servidor de desarrollo"},
+    {"cmd": "bun build ./index.ts --outdir ./dist", "desc": "Compilar TypeScript"},
+    {"cmd": "bun test", "desc": "Ejecutar tests"}
+  ],
+  "cargo":    [
+    {"cmd": "cargo build --release", "desc": "Compilar en modo release"},
+    {"cmd": "cargo run", "desc": "Compilar y ejecutar"},
+    {"cmd": "cargo test", "desc": "Ejecutar todos los tests"},
+    {"cmd": "cargo check", "desc": "Verificar sin compilar"},
+    {"cmd": "cargo clippy", "desc": "Linter de Rust"},
+    {"cmd": "cargo add <crate>", "desc": "Añadir dependencia al proyecto"}
+  ],
+  "python3":  [
+    {"cmd": "python3 -m venv .venv && source .venv/bin/activate", "desc": "Crear y activar entorno virtual"},
+    {"cmd": "python3 -m unittest discover -v", "desc": "Ejecutar todos los tests unitarios"},
+    {"cmd": "python3 -m http.server 8080", "desc": "Servidor HTTP simple en puerto 8080"},
+    {"cmd": "python3 -c \"import <module>; help(<module>)\"", "desc": "Ver documentación de un módulo"}
+  ],
+  "pip":      [
+    {"cmd": "pip install -r requirements.txt", "desc": "Instalar dependencias del proyecto"},
+    {"cmd": "pip freeze > requirements.txt", "desc": "Exportar dependencias instaladas"},
+    {"cmd": "pip list --outdated", "desc": "Ver paquetes desactualizados"},
+    {"cmd": "pip install --upgrade <package>", "desc": "Actualizar un paquete"}
+  ],
+  "uv":       [
+    {"cmd": "uv init <project>", "desc": "Crear nuevo proyecto Python"},
+    {"cmd": "uv add <package>", "desc": "Añadir dependencia"},
+    {"cmd": "uv run <script>.py", "desc": "Ejecutar script en entorno aislado"},
+    {"cmd": "uv sync", "desc": "Sincronizar entorno con lockfile"}
+  ],
+  "nvim":     [
+    {"cmd": "nvim <file>", "desc": "Abrir archivo en Neovim"},
+    {"cmd": "nvim .", "desc": "Abrir explorador de archivos en directorio actual"},
+    {"cmd": "nvim -d <file1> <file2>", "desc": "Comparar dos archivos (diff)"}
+  ],
+  "tmux":     [
+    {"cmd": "tmux new -s <session>", "desc": "Crear nueva sesión con nombre"},
+    {"cmd": "tmux attach -t <session>", "desc": "Reconectar a sesión existente"},
+    {"cmd": "tmux ls", "desc": "Listar sesiones activas"},
+    {"cmd": "tmux kill-session -t <session>", "desc": "Terminar una sesión"}
+  ],
+  "fzf":      [
+    {"cmd": "fzf --preview 'cat {}'", "desc": "Búsqueda interactiva con preview de archivos"},
+    {"cmd": "history | fzf", "desc": "Buscar en historial de comandos"}
+  ],
+  "rg":       [
+    {"cmd": "rg <pattern>", "desc": "Buscar patrón en archivos recursivamente"},
+    {"cmd": "rg <pattern> --type <ext>", "desc": "Buscar solo en archivos de un tipo"},
+    {"cmd": "rg -l <pattern>", "desc": "Listar solo archivos que contienen el patrón"}
+  ],
+  "fd":       [
+    {"cmd": "fd <name>", "desc": "Buscar archivos por nombre"},
+    {"cmd": "fd -e <ext>", "desc": "Buscar archivos por extensión"},
+    {"cmd": "fd -t d <name>", "desc": "Buscar solo directorios"}
+  ],
+  "bat":      [
+    {"cmd": "bat <file>", "desc": "Ver archivo con resaltado de sintaxis"},
+    {"cmd": "bat --diff <file>", "desc": "Ver diff con resaltado"}
+  ],
+  "eza":      [
+    {"cmd": "eza -la --git", "desc": "Listado detallado con estado git"},
+    {"cmd": "eza --tree --level=2", "desc": "Vista de árbol de directorios (2 niveles)"}
+  ],
+  "htop":     [{"cmd": "htop", "desc": "Monitor de recursos interactivo"}],
+  "btop":     [{"cmd": "btop", "desc": "Monitor de recursos avanzado con gráficas"}],
+  "curl":     [
+    {"cmd": "curl -I <url>", "desc": "Ver cabeceras HTTP de una URL"},
+    {"cmd": "curl -o <file> <url>", "desc": "Descargar archivo desde URL"},
+    {"cmd": "curl -X POST -H 'Content-Type: application/json' -d '{\"key\":\"val\"}' <url>", "desc": "Petición POST con JSON"}
+  ],
+  "wget":     [
+    {"cmd": "wget <url>", "desc": "Descargar archivo desde URL"},
+    {"cmd": "wget -r -np <url>", "desc": "Descargar sitio web recursivamente"}
+  ],
+  "ssh":      [
+    {"cmd": "ssh <user>@<host>", "desc": "Conectar a servidor remoto"},
+    {"cmd": "ssh-keygen -t ed25519 -C \"<email>\"", "desc": "Generar par de claves SSH moderno"},
+    {"cmd": "ssh-copy-id <user>@<host>", "desc": "Copiar clave pública al servidor"}
+  ],
+  "rsync":    [
+    {"cmd": "rsync -avzP <src> <dest>", "desc": "Sincronizar con progreso y compresión"},
+    {"cmd": "rsync -avzP --delete <src> <dest>", "desc": "Sincronizar eliminando archivos borrados en origen"}
+  ],
+  "make":     [
+    {"cmd": "make", "desc": "Ejecutar target por defecto"},
+    {"cmd": "make -j$(nproc)", "desc": "Compilar usando todos los núcleos"},
+    {"cmd": "make clean", "desc": "Limpiar archivos compilados"}
+  ],
+  "cmake":    [
+    {"cmd": "cmake -B build -S . && cmake --build build", "desc": "Configurar y compilar"},
+    {"cmd": "cmake -B build -DCMAKE_BUILD_TYPE=Release && cmake --build build", "desc": "Build en modo Release"}
+  ],
+  "go":       [
+    {"cmd": "go run .", "desc": "Ejecutar el paquete actual"},
+    {"cmd": "go build -o <binary> .", "desc": "Compilar binario"},
+    {"cmd": "go test ./...", "desc": "Ejecutar todos los tests"},
+    {"cmd": "go mod tidy", "desc": "Limpiar dependencias no usadas"}
+  ],
+  "java":     [
+    {"cmd": "javac <file>.java && java <class>", "desc": "Compilar y ejecutar clase Java"},
+    {"cmd": "java -jar <file>.jar", "desc": "Ejecutar archivo JAR"}
+  ],
+  "mvn":      [
+    {"cmd": "mvn clean install", "desc": "Limpiar y construir el proyecto"},
+    {"cmd": "mvn test", "desc": "Ejecutar tests"},
+    {"cmd": "mvn spring-boot:run", "desc": "Iniciar aplicación Spring Boot"}
+  ],
+  "gradle":   [
+    {"cmd": "./gradlew build", "desc": "Construir el proyecto"},
+    {"cmd": "./gradlew test", "desc": "Ejecutar tests"},
+    {"cmd": "./gradlew bootRun", "desc": "Iniciar aplicación Spring Boot"}
+  ],
+  "ruby":     [
+    {"cmd": "ruby <file>.rb", "desc": "Ejecutar script Ruby"},
+    {"cmd": "bundle install", "desc": "Instalar gemas del Gemfile"}
+  ],
+  "php":      [
+    {"cmd": "php -S localhost:8080", "desc": "Servidor de desarrollo PHP"},
+    {"cmd": "composer install", "desc": "Instalar dependencias PHP"}
+  ],
+  "mysql":    [
+    {"cmd": "mysql -u <user> -p <database>", "desc": "Conectar a base de datos MySQL"},
+    {"cmd": "mysqldump -u <user> -p <database> > dump.sql", "desc": "Exportar base de datos"}
+  ],
+  "psql":     [
+    {"cmd": "psql -U <user> -d <database>", "desc": "Conectar a base de datos PostgreSQL"},
+    {"cmd": "pg_dump -U <user> <database> > dump.sql", "desc": "Exportar base de datos"}
+  ],
+  "redis-cli":[
+    {"cmd": "redis-cli ping", "desc": "Verificar que Redis está activo"},
+    {"cmd": "redis-cli monitor", "desc": "Ver comandos en tiempo real"},
+    {"cmd": "redis-cli flushdb", "desc": "Limpiar base de datos actual"}
+  ],
+  "ffmpeg":   [
+    {"cmd": "ffmpeg -i <input> <output>.mp4", "desc": "Convertir video a MP4"},
+    {"cmd": "ffmpeg -i <input> -vn -acodec mp3 <output>.mp3", "desc": "Extraer audio como MP3"},
+    {"cmd": "ffmpeg -i <input> -ss <start> -t <duration> <output>", "desc": "Recortar video"}
+  ],
+  "imagemagick": [
+    {"cmd": "convert <input> -resize 50% <output>", "desc": "Redimensionar imagen al 50%"},
+    {"cmd": "convert <input>.png <output>.jpg", "desc": "Convertir formato de imagen"}
+  ],
+  "starship": [{"cmd": "starship init zsh", "desc": "Inicializar Starship en zsh"}],
+  "zoxide":   [
+    {"cmd": "z <dir>", "desc": "Saltar a directorio frecuente"},
+    {"cmd": "zi", "desc": "Seleccionar directorio frecuente con fzf"}
+  ],
+  "lazygit":  [{"cmd": "lazygit", "desc": "Interfaz TUI para git"}],
+  "lazydocker":[{"cmd": "lazydocker", "desc": "Interfaz TUI para Docker"}],
+  "yazi":     [{"cmd": "yazi", "desc": "Explorador de archivos TUI"}],
+  "nmap":     [
+    {"cmd": "nmap -sV <host>", "desc": "Escanear puertos y versiones de servicios"},
+    {"cmd": "nmap -p 1-65535 <host>", "desc": "Escanear todos los puertos"}
+  ],
+  "aws":      [
+    {"cmd": "aws s3 ls s3://<bucket>", "desc": "Listar contenido de bucket S3"},
+    {"cmd": "aws ec2 describe-instances --output table", "desc": "Listar instancias EC2"},
+    {"cmd": "aws logs tail <log-group> --follow", "desc": "Ver logs de CloudWatch en tiempo real"}
+  ],
+  "gcloud":   [
+    {"cmd": "gcloud compute instances list", "desc": "Listar instancias de Compute Engine"},
+    {"cmd": "gcloud auth login", "desc": "Autenticarse en Google Cloud"}
+  ],
+  "az":       [
+    {"cmd": "az vm list -o table", "desc": "Listar máquinas virtuales de Azure"},
+    {"cmd": "az login", "desc": "Autenticarse en Azure"}
+  ],
+  "systemctl":[
+    {"cmd": "systemctl status <service>", "desc": "Ver estado de un servicio"},
+    {"cmd": "systemctl enable --now <service>", "desc": "Habilitar e iniciar servicio"},
+    {"cmd": "systemctl restart <service>", "desc": "Reiniciar servicio"},
+    {"cmd": "systemctl list-units --failed", "desc": "Ver servicios con fallos"}
+  ],
+  "journalctl":[
+    {"cmd": "journalctl -xe", "desc": "Ver logs del sistema con contexto de errores"},
+    {"cmd": "journalctl -u <service> -f", "desc": "Seguir logs de un servicio en tiempo real"},
+    {"cmd": "journalctl --since today", "desc": "Ver logs del día de hoy"}
+  ]
+}

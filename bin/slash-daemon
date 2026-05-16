@@ -1,0 +1,52 @@
+#!/usr/bin/env bash
+
+# --- xzp-slash: Background Daemon ---
+# Resolve paths
+SELF_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+if [[ -f "$SELF_DIR/../lib/slash-env.sh" ]]; then
+    source "$SELF_DIR/../lib/slash-env.sh"
+elif [[ -f "/usr/lib/slash/slash-env.sh" ]]; then
+    source "/usr/lib/slash/slash-env.sh"
+elif [[ -f "/data/data/com.termux/files/usr/lib/slash/slash-env.sh" ]]; then
+    source "/data/data/com.termux/files/usr/lib/slash/slash-env.sh"
+else
+    echo "Error: slash-env.sh not found."
+    exit 1
+fi
+
+echo $$ > "$PID_FILE"
+
+_list_all_pkgs() {
+    if command -v pacman >/dev/null 2>&1; then
+        pacman -Slq 2>/dev/null
+    elif command -v apt-cache >/dev/null 2>&1; then
+        apt-cache pkgnames 2>/dev/null | sort
+    elif command -v dnf >/dev/null 2>&1; then
+        dnf repoquery --qf '%{name}' 2>/dev/null
+    elif command -v apk >/dev/null 2>&1; then
+        apk search -q 2>/dev/null
+    elif command -v pkg >/dev/null 2>&1; then
+        pkg list-all 2>/dev/null | awk -F/ '{print $1}' | tail -n +3
+    fi
+}
+
+update_pkg_cache() {
+    if [[ ! -f "$PKG_CACHE" ]] || [[ $(find "$PKG_CACHE" -mmin +1440 2>/dev/null) ]]; then
+        _list_all_pkgs > "$PKG_CACHE.tmp" && mv "$PKG_CACHE.tmp" "$PKG_CACHE"
+    fi
+}
+
+# Escanear qué binarios del tool_registry están instalados en PATH
+update_tools_cache() {
+    if [[ ! -f "$TOOLS_CACHE" ]] || [[ $(find "$TOOLS_CACHE" -mmin +60 2>/dev/null) ]]; then
+        jq -r 'keys[]' "$TOOL_REGISTRY" | while read bin; do
+            command -v "$bin" >/dev/null 2>&1 && echo "$bin"
+        done > "$TOOLS_CACHE.tmp" && mv "$TOOLS_CACHE.tmp" "$TOOLS_CACHE"
+    fi
+}
+
+while true; do
+    update_tools_cache
+    update_pkg_cache
+    sleep 3600
+done
