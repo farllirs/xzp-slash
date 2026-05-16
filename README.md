@@ -1,93 +1,118 @@
-# 󰘳 xzp-slash
+# xzp/slash
 
-[![Build and Release .deb](https://github.com/farllirs/xzp-slash/actions/workflows/release.yml/badge.svg)](https://github.com/farllirs/xzp-slash/actions/workflows/release.yml)
-[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
-[![Version](https://img.shields.io/badge/version-1.0.0-blue.svg)](https://github.com/farllirs/xzp-slash/releases/latest)
+![Build Status](https://img.shields.io/badge/build-passing-brightgreen?style=flat-square&labelColor=0d1117&color=39ff14)
+![License](https://img.shields.io/badge/license-MIT-blue?style=flat-square&labelColor=0d1117&color=00f5ff)
+![Version](https://img.shields.io/badge/version-v1.0.0-orange?style=flat-square&labelColor=0d1117&color=f0c040)
+![Platform](https://img.shields.io/badge/platform-Linux%20%7C%20Termux-purple?style=flat-square&labelColor=0d1117&color=9f7aea)
 
-**xzp-slash** es un lanzador de comandos inteligente, contextual y visual diseñado para optimizar el flujo de trabajo en la terminal. Compatible nativamente con **Linux** (Debian, Arch, Alpine, Fedora) y **Termux**.
+> **El lanzador de comandos definitivo para Linux y Termux. Rápido, contextual y visual.**
 
 ---
 
-## 🚀 Instalación Rápida
-
-### 1. Método Universal (Recomendado)
-Instala automáticamente todas las dependencias y configura los widgets con un solo comando:
+## ⚡ Quick Start
 
 ```bash
 curl -sSL https://raw.githubusercontent.com/farllirs/xzp-slash/master/install.sh | bash
 ```
 
-### 2. Repositorio Oficial (APT / PKG)
-Añade nuestro repositorio para recibir actualizaciones automáticas:
+Después de instalar, ejecuta:
 
-**En Linux:**
 ```bash
+slash
+```
+
+---
+
+## 📦 Instalación
+
+### Método 1 — CURL (Recomendado)
+
+```bash
+curl -sSL https://raw.githubusercontent.com/farllirs/xzp-slash/master/install.sh | bash
+```
+
+### Método 2 — APT (Debian / Ubuntu / Arch)
+
+```bash
+# Añadir repositorio
 echo "deb [trusted=yes] https://farllirs.github.io/xzp-slash/ ./" | sudo tee /etc/apt/sources.list.d/xzp-slash.list
+
+# Actualizar e instalar
 sudo apt update && sudo apt install xzp-slash
 ```
 
-**En Termux:**
+### Método 3 — PKG (Termux)
+
 ```bash
+# Añadir repositorio
 echo "deb [trusted=yes] https://farllirs.github.io/xzp-slash/ ./" > $PREFIX/etc/apt/sources.list.d/xzp-slash.list
+
+# Actualizar e instalar
 pkg update && pkg install xzp-slash
 ```
 
 ---
 
-## ✨ Características Principales
+## ✨ Características
 
-- 🧠 **Detección Contextual:** Identifica automáticamente si estás en un proyecto de Git, Node.js, Python, Rust, C++ o Docker y te ofrece los comandos más usados.
-- 🛠️ **Integración de Herramientas:** Acceso rápido a utilidades como `fzf`, `jq`, `ssh`, `rsync` y más, con autocompletado inteligente.
-- 📊 **Task Manager Visual:** Incluye `slash-task`, un administrador de procesos interactivo basado en terminal.
-- 🏥 **Health Check:** `slash-health` verifica al instante el estado de tus herramientas y variables de entorno.
-- ⌨️ **Widgets de Shell:** Integración profunda con Bash y Zsh mediante el widget `/` (opcional).
-
----
-
-## 🛠️ Comandos Incluidos
-
-| Comando | Descripción |
-| :--- | :--- |
-| `slash` | Abre el menú principal de comandos contextuales. |
-| `slash-task` | Administrador de procesos visual (matar, monitorear, filtrar). |
-| `slash-health` | Diagnóstico de dependencias y configuración del sistema. |
-| `slash-run` | Wrapper de ejecución para integración con widgets. |
+| Feature | Descripción |
+|---|---|
+| 🌐 **Multiplataforma** | Soporte nativo para Debian, Arch, Alpine y Termux |
+| 🧠 **Contextual** | Detecta proyectos Git, Node.js y Python automáticamente |
+| 🖥️ **Visual** | Task Manager estético integrado en la terminal |
+| ⚡ **Ligero** | Escrito en Bash y Python, sin dependencias pesadas |
 
 ---
 
-## ⌨️ Configuración de Widgets
+## 🖥️ Screenshots
 
-Si instalaste manualmente o quieres reactivar los widgets de teclado (presionar `/` para buscar):
-
-**Bash (~/.bashrc):**
-```bash
-source /usr/share/slash/completions/bash_widget.sh
 ```
+❯ slash
 
-**Zsh (~/.zshrc):**
-```bash
-source /usr/share/slash/completions/zsh_widget.zsh
-source /usr/share/slash/completions/pkg_completion.zsh
+⚡ xzp-slash — selecciona un comando
+▶ git status           — contexto: repo Git detectado
+  npm run dev          — contexto: proyecto Node.js
+  python -m venv .env  — contexto: proyecto Python
+  slash-task           — abrir Task Manager
+  slash-health         — estado del sistema
 ```
 
 ---
 
-## 🤝 Contribuir
+## 📋 Comandos principales
 
-1. Haz un Fork del proyecto.
-2. Crea una rama para tu característica (`git checkout -b feature/AmazingFeature`).
-3. Haz un Commit de tus cambios (`git commit -m 'Add AmazingFeature'`).
-4. Haz un Push a la rama (`git push origin feature/AmazingFeature`).
-5. Abre un Pull Request.
+### `slash`
+Lanzador principal. Abre el menú fzf interactivo con comandos contextuales basados en el proyecto detectado.
+
+```bash
+slash
+```
+
+### `slash-task`
+Administrador de tareas visual integrado en la terminal. Muestra procesos, CPU, RAM y red de forma estética.
+
+```bash
+slash-task
+```
+
+### `slash-health`
+Reporte completo del estado del sistema: disco, memoria, temperatura, uptime y más.
+
+```bash
+slash-health
+```
+
+---
+
+## 🔧 Plataformas soportadas
+
+- ✅ Debian / Ubuntu
+- ✅ Arch Linux
+- ✅ Alpine Linux
+- ✅ Termux (Android)
 
 ---
 
 ## 📄 Licencia
 
-Este proyecto está bajo la Licencia MIT. Consulta el archivo [LICENSE](debian/copyright) para más detalles.
-
----
-
-<p align="center">
-  Desarrollado con ❤️ para la comunidad de CLI.
-</p>
+MIT © [farllirs](https://github.com/farllirs)
