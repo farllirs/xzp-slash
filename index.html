@@ -1,1 +1,688 @@
-<html><body><h1>xzp-slash APT Repository</h1><p>Add this to your sources: deb [trusted=yes] https://farllirs.github.io/xzp-slash/ ./</p></body></html>
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>xzp-slash | Minimalist Launcher</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=DM+Mono:ital,wght@0,300;0,400;0,500;1,300&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" />
+
+  <style>
+    :root {
+      /* Modo Claro - Google Minimalist Style */
+      --bg: #ffffff;
+      --surface: #f8f9fa;
+      --surface-alt: #f1f3f4;
+      --border: #e0e0e0;
+      --border-hover: #bdc1c6;
+      
+      --primary: #009688;
+      --primary-hover: #00796b;
+      --primary-light: #e0f2f1;
+      
+      --text-main: #202124;
+      --text-muted: #5f6368;
+      
+      --pastel-blue: #e8f0fe;
+      --pastel-blue-txt: #1a73e8;
+      --pastel-yellow: #fef7e0;
+      --pastel-yellow-txt: #b06000;
+      --pastel-green: #e6f4ea;
+      --pastel-green-txt: #137333;
+
+      --mono: 'DM Mono', monospace;
+      --sans: 'Inter', sans-serif;
+      --ease: cubic-bezier(0.2, 0, 0, 1);
+      
+      --shadow-sm: 0 1px 2px 0 rgba(60,64,67,0.15), 0 1px 3px 1px rgba(60,64,67,0.1);
+      --shadow-lg: 0 4px 6px 0 rgba(60,64,67,0.1), 0 8px 24px 3px rgba(60,64,67,0.08);
+    }
+
+    [data-theme="dark"] {
+      /* Modo Oscuro Pro - Confortable y Elegante */
+      --bg: #0f1115;
+      --surface: #161a22;
+      --surface-alt: #1f242e;
+      --border: #262c36;
+      --border-hover: #3b4454;
+      
+      --primary: #26a69a;
+      --primary-hover: #4db6ac;
+      --primary-light: #004d40;
+      
+      --text-main: #f1f3f4;
+      --text-muted: #9aa0a6;
+      
+      --pastel-blue: rgba(26, 115, 232, 0.15);
+      --pastel-blue-txt: #8ab4f8;
+      --pastel-yellow: rgba(244, 180, 0, 0.15);
+      --pastel-yellow-txt: #fde293;
+      --pastel-green: rgba(15, 157, 88, 0.15);
+      --pastel-green-txt: #81c784;
+      
+      --shadow-sm: 0 1px 3px rgba(0,0,0,0.3);
+      --shadow-lg: 0 12px 32px rgba(0,0,0,0.4);
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    html { scroll-behavior: smooth; }
+
+    body {
+      background: var(--bg);
+      color: var(--text-main);
+      font-family: var(--sans);
+      font-size: 15px;
+      line-height: 1.6;
+      -webkit-font-smoothing: antialiased;
+      overflow-x: hidden;
+      transition: background 0.3s var(--ease), color 0.3s var(--ease);
+    }
+
+    /* ── NAVEGACIÓN ── */
+    nav {
+      position: fixed;
+      top: 0; left: 0; right: 0;
+      z-index: 100;
+      padding: 0 max(24px, 4vw);
+      height: 72px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      background: rgba(var(--bg), 0.85);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      border-bottom: 1px solid transparent;
+      transition: border-color 0.3s var(--ease), background 0.3s var(--ease);
+    }
+    nav.scrolled {
+      border-color: var(--border);
+      background: var(--bg);
+    }
+    .nav-logo {
+      font-size: 22px;
+      font-weight: 500;
+      letter-spacing: -0.02em;
+    }
+    .nav-logo span { color: var(--text-muted); font-weight: 300; }
+    .nav-links {
+      display: flex;
+      gap: 32px;
+      list-style: none;
+    }
+    .nav-links a {
+      font-size: 14px;
+      font-weight: 500;
+      color: var(--text-muted);
+      text-decoration: none;
+      transition: color 0.2s;
+    }
+    .nav-links a:hover { color: var(--text-main); }
+    
+    .nav-actions {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+    .theme-toggle {
+      background: transparent;
+      border: 1px solid var(--border);
+      color: var(--text-main);
+      width: 38px;
+      height: 38px;
+      border-radius: 50%;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 14px;
+      transition: all 0.2s var(--ease);
+    }
+    .theme-toggle:hover {
+      background: var(--surface);
+      border-color: var(--border-hover);
+    }
+    .nav-gh {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 8px 16px;
+      border: 1px solid var(--border);
+      border-radius: 20px;
+      font-size: 14px;
+      font-weight: 500;
+      color: var(--text-main);
+      text-decoration: none;
+      transition: all 0.2s var(--ease);
+    }
+    .nav-gh:hover {
+      background: var(--surface);
+      border-color: var(--border-hover);
+    }
+
+    /* ── ESTRUCTURA GENERAL ── */
+    .container {
+      max-width: 1140px;
+      margin: 0 auto;
+      padding: 0 24px;
+    }
+    section { padding: 80px 0; }
+
+    /* ── SECCIÓN HERO ── */
+    .hero {
+      padding-top: 140px;
+      padding-bottom: 60px;
+      display: grid;
+      grid-template-columns: 1.1fr 0.9fr;
+      gap: 40px;
+      align-items: center;
+    }
+    .hero-title {
+      font-size: clamp(40px, 5vw, 64px);
+      font-weight: 500;
+      letter-spacing: -0.03em;
+      line-height: 1.15;
+      margin-bottom: 20px;
+    }
+    .hero-title span { color: var(--primary); }
+    .hero-sub {
+      font-size: 17px;
+      color: var(--text-muted);
+      margin-bottom: 32px;
+      max-width: 520px;
+      line-height: 1.6;
+    }
+    .plat-row {
+      display: flex;
+      gap: 10px;
+      margin-bottom: 36px;
+      flex-wrap: wrap;
+    }
+    .plat-pill {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      padding: 6px 14px;
+      border-radius: 100px;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      font-size: 13px;
+      font-weight: 500;
+      color: var(--text-muted);
+    }
+    
+    .hero-actions { display: flex; gap: 14px; flex-wrap: wrap; }
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 12px 24px;
+      border-radius: 100px;
+      font-size: 14px;
+      font-weight: 500;
+      cursor: pointer;
+      text-decoration: none;
+      transition: all 0.2s var(--ease);
+      border: 1px solid transparent;
+    }
+    .btn-primary {
+      background: var(--primary);
+      color: white;
+    }
+    .btn-primary:hover {
+      background: var(--primary-hover);
+    }
+    .btn-outline {
+      background: transparent;
+      color: var(--text-main);
+      border-color: var(--border);
+    }
+    .btn-outline:hover {
+      background: var(--surface);
+      border-color: var(--border-hover);
+    }
+
+    /* ── COMPONENTE VISTA PREVIA (WIDGET) ── */
+    .widget-container {
+      background: var(--surface);
+      border-radius: 20px;
+      padding: 24px;
+      box-shadow: var(--shadow-lg);
+      border: 1px solid var(--border);
+    }
+    .widget-search {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 12px 16px;
+      background: var(--bg);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      margin-bottom: 20px;
+      color: var(--text-muted);
+    }
+    .widget-search input {
+      border: none; outline: none; font-size: 14px; width: 100%; font-family: var(--sans); background: transparent; color: var(--text-main);
+    }
+    .widget-title {
+      font-size: 11px;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      color: var(--text-muted);
+      margin-bottom: 12px;
+    }
+    .cmd-item {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 12px 16px;
+      border-radius: 10px;
+      margin-bottom: 8px;
+      font-family: var(--mono);
+      font-size: 13px;
+    }
+    .cmd-item:last-child { margin-bottom: 0; }
+    .cmd-item.git { background: var(--pastel-blue); color: var(--pastel-blue-txt); }
+    .cmd-item.node { background: var(--pastel-yellow); color: var(--pastel-yellow-txt); }
+    .cmd-item.py { background: var(--pastel-green); color: var(--pastel-green-txt); }
+    .cmd-item .badge {
+      font-family: var(--sans);
+      font-size: 11px;
+      font-weight: 500;
+      padding: 3px 8px;
+      border-radius: 6px;
+      background: rgba(var(--bg), 0.5);
+    }
+
+    /* ── TÍTULOS DE SECCIÓN ── */
+    .sec-header { margin-bottom: 36px; }
+    .sec-title {
+      font-size: 28px;
+      font-weight: 500;
+      letter-spacing: -0.02em;
+      margin-bottom: 8px;
+    }
+    .sec-desc {
+      font-size: 15px;
+      color: var(--text-muted);
+      max-width: 540px;
+    }
+
+    /* ── PANEL DE INSTALACIÓN (TABS) ── */
+    .install-box {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 20px;
+      padding: 24px;
+      box-shadow: var(--shadow-sm);
+    }
+    .tab-bar {
+      display: flex;
+      gap: 8px;
+      margin-bottom: 20px;
+      border-bottom: 1px solid var(--border);
+      padding-bottom: 12px;
+      flex-wrap: wrap;
+    }
+    .tab {
+      padding: 8px 16px;
+      border-radius: 8px;
+      font-size: 13px;
+      font-weight: 500;
+      cursor: pointer;
+      color: var(--text-muted);
+      background: transparent;
+      border: 1px solid transparent;
+      transition: all 0.2s;
+    }
+    .tab.active {
+      background: var(--surface-alt);
+      color: var(--text-main);
+      border-color: var(--border);
+    }
+    .panel { display: none; }
+    .panel.active { display: block; animation: fadeIn 0.25s var(--ease); }
+
+    .code-block {
+      background: var(--bg);
+      border-radius: 12px;
+      overflow: hidden;
+      border: 1px solid var(--border);
+    }
+    .code-top {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 10px 16px;
+      background: var(--surface-alt);
+      border-bottom: 1px solid var(--border);
+    }
+    .code-lang { font-family: var(--mono); font-size: 11px; color: var(--text-muted); }
+    .copy-btn {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      padding: 6px 12px;
+      font-size: 12px;
+      font-weight: 500;
+      cursor: pointer;
+      color: var(--text-main);
+      transition: all 0.2s;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+    .copy-btn:hover { background: var(--surface-alt); border-color: var(--border-hover); }
+    .code-content {
+      padding: 20px;
+      font-family: var(--mono);
+      font-size: 13px;
+      color: var(--text-main);
+      overflow-x: auto;
+      white-space: pre;
+    }
+
+    /* ── CARACTERÍSTICAS ── */
+    .features-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: 20px;
+    }
+    .feature-card {
+      padding: 28px;
+      border-radius: 20px;
+      border: 1px solid var(--border);
+      background: var(--surface);
+    }
+    .f-icon {
+      width: 44px; height: 44px;
+      border-radius: 12px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 18px;
+      margin-bottom: 16px;
+    }
+    .f-blue { background: var(--pastel-blue); color: var(--pastel-blue-txt); }
+    .f-green { background: var(--pastel-green); color: var(--pastel-green-txt); }
+    .f-yellow { background: var(--pastel-yellow); color: var(--pastel-yellow-txt); }
+    
+    .feature-card h3 { font-size: 17px; font-weight: 500; margin-bottom: 8px; }
+    .feature-card p { font-size: 14px; color: var(--text-muted); }
+
+    /* ── SECCIÓN DE COMANDOS ── */
+    .cmd-list {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+    .cmd-row {
+      display: grid;
+      grid-template-columns: 180px 1fr;
+      padding: 20px 24px;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      align-items: center;
+      gap: 20px;
+    }
+    .cmd-name {
+      font-family: var(--mono);
+      font-size: 15px;
+      font-weight: 500;
+      color: var(--primary);
+    }
+    .cmd-desc { font-size: 14px; color: var(--text-muted); }
+    .cmd-desc code {
+      font-family: var(--mono);
+      padding: 2px 6px;
+      background: var(--bg);
+      border-radius: 4px;
+      font-size: 13px;
+      color: var(--text-main);
+    }
+
+    /* ── PIE DE PÁGINA ── */
+    footer {
+      border-top: 1px solid var(--border);
+      padding: 32px 0;
+      text-align: center;
+      color: var(--text-muted);
+      font-size: 13px;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(4px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    /* ── RESPONSIVE RESPALDO ── */
+    @media (max-width: 900px) {
+      .hero { grid-template-columns: 1fr; text-align: center; padding-top: 110px; gap: 32px; }
+      .hero-sub { margin: 0 auto 24px; }
+      .plat-row, .hero-actions { justify-content: center; }
+      .cmd-row { grid-template-columns: 1fr; gap: 8px; }
+    }
+    @media (max-width: 600px) {
+      nav { padding: 0 16px; }
+      .nav-links { display: none; }
+    }
+  </style>
+</head>
+<body>
+
+  <nav id="nav">
+    <div class="nav-logo">xzp<span>/slash</span></div>
+    <ul class="nav-links">
+      <li><a href="#install">Instalación</a></li>
+      <li><a href="#features">Características</a></li>
+      <li><a href="#commands">Comandos</a></li>
+    </ul>
+    <div class="nav-actions">
+      <button class="theme-toggle" id="themeBtn" aria-label="Cambiar Tema">
+        <i class="fa-solid fa-moon"></i>
+      </button>
+      <a href="https://github.com/farllirs/xzp-slash" target="_blank" class="nav-gh">
+        <i class="fa-brands fa-github"></i> GitHub
+      </a>
+    </div>
+  </nav>
+
+  <main class="container">
+    <header class="hero">
+      <div class="hero-left">
+        <h1 class="hero-title">xzp<span>/</span>slash</h1>
+        <p class="hero-sub">El lanzador de comandos definitivo para Linux y Termux. Rápido, contextual y visual.</p>
+        
+        <div class="plat-row">
+          <span class="plat-pill"><i class="fa-brands fa-debian"></i> Debian</span>
+          <span class="plat-pill"><i class="fa-solid fa-archway"></i> Arch</span>
+          <span class="plat-pill"><i class="fa-brands fa-linux"></i> Linux</span>
+          <span class="plat-pill"><i class="fa-brands fa-android"></i> Termux</span>
+        </div>
+
+        <div class="hero-actions">
+          <a href="#install" class="btn btn-primary">Instalar</a>
+          <a href="https://github.com/farllirs/xzp-slash" target="_blank" class="btn btn-outline">Ver código</a>
+        </div>
+      </div>
+
+      <div class="hero-right">
+        <div class="widget-container">
+          <div class="widget-search">
+            <i class="fa-solid fa-magnifying-glass"></i>
+            <input type="text" placeholder="Escribe un comando o busca..." readonly />
+          </div>
+          <div class="widget-title">Contextual Command Menu</div>
+          <div class="cmd-item git">
+            <span><i class="fa-brands fa-git-alt"></i> git status</span>
+            <span class="badge">Git Detectado</span>
+          </div>
+          <div class="cmd-item node">
+            <span><i class="fa-brands fa-node-js"></i> npm run dev</span>
+            <span class="badge">Node Detectado</span>
+          </div>
+          <div class="cmd-item py">
+            <span><i class="fa-brands fa-python"></i> python -m venv .env</span>
+            <span class="badge">Python Detectado</span>
+          </div>
+        </div>
+      </div>
+    </header>
+
+    <section id="install">
+      <div class="sec-header">
+        <h2 class="sec-title">Instalación automatizada</h2>
+        <p class="sec-desc">Selecciona tu entorno y copia el script verificado para desplegar la herramienta.</p>
+      </div>
+
+      <div class="install-box">
+        <div class="tab-bar">
+          <button class="tab active" onclick="switchTab('curl')">CURL (Universal)</button>
+          <button class="tab" onclick="switchTab('apt')">APT (Debian/Ubuntu)</button>
+          <button class="tab" onclick="switchTab('pkg')">PKG (Termux)</button>
+        </div>
+
+        <div class="panel active" id="panel-curl">
+          <div class="code-block">
+            <div class="code-top">
+              <span class="code-lang">BASH</span>
+              <button class="copy-btn" onclick="copyCode('raw-curl', this)"><i class="fa-regular fa-clone"></i> Copiar código</button>
+            </div>
+            <div class="code-content" id="raw-curl">curl -sSL https://raw.githubusercontent.com/farllirs/xzp-slash/master/install.sh | bash</div>
+          </div>
+        </div>
+
+        <div class="panel" id="panel-apt">
+          <div class="code-block">
+            <div class="code-top">
+              <span class="code-lang">BASH</span>
+              <button class="copy-btn" onclick="copyCode('raw-apt', this)"><i class="fa-regular fa-clone"></i> Copiar código</button>
+            </div>
+            <div class="code-content" id="raw-apt">echo "deb [trusted=yes] https://farllirs.github.io/xzp-slash/ ./" | sudo tee /etc/apt/sources.list.d/xzp-slash.list
+sudo apt update && sudo apt install xzp-slash</div>
+          </div>
+        </div>
+
+        <div class="panel" id="panel-pkg">
+          <div class="code-block">
+            <div class="code-top">
+              <span class="code-lang">BASH</span>
+              <button class="copy-btn" onclick="copyCode('raw-pkg', this)"><i class="fa-regular fa-clone"></i> Copiar código</button>
+            </div>
+            <div class="code-content" id="raw-pkg">echo "deb [trusted=yes] https://farllirs.github.io/xzp-slash/ ./" > $PREFIX/etc/apt/sources.list.d/xzp-slash.list
+pkg update && pkg install xzp-slash</div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section id="features">
+      <div class="sec-header">
+        <h2 class="sec-title">Potente por diseño</h2>
+        <p class="sec-desc">Optimiza tus flujos de trabajo en servidores o entornos locales sin configuraciones densas.</p>
+      </div>
+      
+      <div class="features-grid">
+        <div class="feature-card">
+          <div class="f-icon f-blue"><i class="fa-solid fa-layer-group"></i></div>
+          <h3>Multiplataforma</h3>
+          <p>Soporte nativo para las distribuciones de Linux más empleadas y arquitecturas ARM a través de Termux.</p>
+        </div>
+        <div class="feature-card">
+          <div class="f-icon f-green"><i class="fa-solid fa-wand-magic-sparkles"></i></div>
+          <h3>Detección Contextual</h3>
+          <p>Analiza de forma reactiva la presencia de repositorios Git o entornos de Node.js y Python en el directorio actual.</p>
+        </div>
+        <div class="feature-card">
+          <div class="f-icon f-yellow"><i class="fa-solid fa-chart-pie"></i></div>
+          <h3>Fluidez Interactiva</h3>
+          <p>Administrador de tareas integrado y analíticas en tiempo real empaquetadas sobre la agilidad de fzf.</p>
+        </div>
+      </div>
+    </section>
+
+    <section id="commands">
+      <div class="sec-header">
+        <h2 class="sec-title">Comandos principales</h2>
+      </div>
+
+      <div class="cmd-list">
+        <div class="cmd-row">
+          <div class="cmd-name">slash</div>
+          <div class="cmd-desc">Lanzador principal interactivo. Escanea el contexto directo de carpetas para desplegar tareas rápidas.</div>
+        </div>
+        <div class="cmd-row">
+          <div class="cmd-name">slash -c</div>
+          <div class="cmd-desc">Abre un completo menú visual de configuración enfocado en el usuario. Desde aquí puedes modificar ajustes avanzados del sistema, tales como activar la inicialización o automatización automática del widget al presionar la tecla <code>/</code> (slash).</div>
+        </div>
+        <div class="cmd-row">
+          <div class="cmd-name">slash-task</div>
+          <div class="cmd-desc">Monitor interactivo de procesos en tiempo real. Gestiona hilos, consumo de CPU y memoria de forma visual.</div>
+        </div>
+        <div class="cmd-row">
+          <div class="cmd-name">slash-health</div>
+          <div class="cmd-desc">Diagnóstico rápido del sistema. Imprime un reporte limpio sobre almacenamiento, red y temperaturas críticas.</div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer>
+    <div class="container">
+      <p>xzp/slash &copy; 2026 farllirs. Todos los derechos reservados.</p>
+    </div>
+  </footer>
+
+  <script>
+    // Sombra sutil en navegación al hacer scroll
+    const nav = document.getElementById('nav');
+    window.addEventListener('scroll', () => {
+      nav.classList.toggle('scrolled', window.scrollY > 15);
+    });
+
+    // Control de pestañas de instalación
+    const tabIds = ['curl', 'apt', 'pkg'];
+    function switchTab(id) {
+      document.querySelectorAll('.tab').forEach((t, i) => {
+        t.classList.toggle('active', tabIds[i] === id);
+      });
+      document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
+      document.getElementById('panel-' + id).classList.add('active');
+    }
+
+    // Solución del script de copiado (Corregido y verificado)
+    function copyCode(elementId, btn) {
+      const el = document.getElementById(elementId);
+      if (!el) return;
+      const text = el.innerText || el.textContent;
+      
+      navigator.clipboard.writeText(text.trim()).then(() => {
+        const originalContent = btn.innerHTML;
+        btn.innerHTML = '<i class="fa-solid fa-check"></i> ¡Copiado!';
+        btn.style.pointerEvents = 'none';
+        setTimeout(() => {
+          btn.innerHTML = originalContent;
+          btn.style.pointerEvents = 'auto';
+        }, 2000);
+      }).catch(err => {
+        console.error('Error al copiar el texto: ', err);
+      });
+    }
+
+    // Sistema nativo de alternancia para Modo Oscuro
+    const themeBtn = document.getElementById('themeBtn');
+    themeBtn.addEventListener('click', () => {
+      const isDark = document.body.getAttribute('data-theme') === 'dark';
+      if (isDark) {
+        document.body.removeAttribute('data-theme');
+        themeBtn.innerHTML = '<i class="fa-solid fa-moon"></i>';
+      } else {
+        document.body.setAttribute('data-theme', 'dark');
+        themeBtn.innerHTML = '<i class="fa-solid fa-sun"></i>';
+      }
+    });
+  </script>
+</body>
+</html>
