@@ -50,12 +50,15 @@ install:
 	$(SUDO) test -f $(ETCDIR)/tool_registry.json || $(SUDO) install -m 644 config/tool_registry.json $(ETCDIR)/
 
 uninstall:
+	# Remove binaries
 	$(SUDO) rm -f $(BINDIR)/slash
 	$(SUDO) rm -f $(BINDIR)/slash-daemon
 	$(SUDO) rm -f $(BINDIR)/slash-health
 	$(SUDO) rm -f $(BINDIR)/slash-run
 	$(SUDO) rm -f $(BINDIR)/slash-task
+	# Remove libraries and shared files
 	$(SUDO) rm -rf $(LIBDIR)
 	$(SUDO) rm -rf $(SHAREDIR)
+	# Note: We don't remove ETCDIR automatically to prevent data loss
 
 .PHONY: all install uninstall
