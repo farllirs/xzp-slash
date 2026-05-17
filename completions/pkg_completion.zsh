@@ -1,14 +1,17 @@
-# --- xzp-slash: ZSH Package Manager Completion ---
+#!/usr/bin/env zsh
 
 # Resolve paths
-_SELF_DIR_P="${${(%):-%x}:h}"
-if [[ -f "$_SELF_DIR_P/../lib/slash-env.sh" ]]; then
-    source "$_SELF_DIR_P/../lib/slash-env.sh"
-elif [[ -f "/usr/lib/slash/slash-env.sh" ]]; then
-    source "/usr/lib/slash/slash-env.sh"
-elif [[ -f "/data/data/com.termux/files/usr/lib/slash/slash-env.sh" ]]; then
-    source "/data/data/com.termux/files/usr/lib/slash/slash-env.sh"
-fi
+_slash_load_env_p() {
+    local self_dir="${${(%):-%x}:A:h}"
+    if [[ -f "$self_dir/../../lib/slash-env.sh" ]]; then
+        source "$self_dir/../../lib/slash-env.sh"
+    elif [[ -f "/usr/lib/slash/slash-env.sh" ]]; then
+        source "/usr/lib/slash/slash-env.sh"
+    elif [[ -f "/data/data/com.termux/files/usr/lib/slash/slash-env.sh" ]]; then
+        source "/data/data/com.termux/files/usr/lib/slash/slash-env.sh"
+    fi
+}
+_slash_load_env_p
 
 # Detectar gestor de paquetes activo
 _xzp_detect_pkgmgr() {
@@ -31,6 +34,12 @@ _xzp_pkg_subcmds() {
 }
 
 _xzp_pkg_completion() {
+    # Check if completion is enabled in settings.json dynamically
+    if [[ -f "$SETTINGS_JSON" ]]; then
+        local enabled=$(jq -r '.completion_enabled // true' "$SETTINGS_JSON" 2>/dev/null)
+        [[ "$enabled" != "true" ]] && return
+    fi
+
     if (( CURRENT == 2 )); then
         local -a subcmds
         subcmds=(${(f)"$(_xzp_pkg_subcmds)"})
@@ -45,7 +54,7 @@ _xzp_pkg_completion() {
     fi
 }
 
-# Registrar completador solo si está habilitado y se detectó un gestor
-if [[ -n "$_XZP_PKG_MGR" ]] && grep -q '"completion_enabled": true' "$SETTINGS_JSON" 2>/dev/null; then
+# Register completion if manager is detected
+if [[ -n "$_XZP_PKG_MGR" ]]; then
     compdef _xzp_pkg_completion "$_XZP_PKG_MGR"
 fi
