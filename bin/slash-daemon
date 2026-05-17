@@ -1,6 +1,5 @@
 #!/usr/bin/env bash
 
-# --- xzp-slash: Background Daemon ---
 # Resolve paths
 SELF_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 if [[ -f "$SELF_DIR/../lib/slash-env.sh" ]]; then
@@ -14,39 +13,44 @@ else
     exit 1
 fi
 
+# Write PID
 echo $$ > "$PID_FILE"
 
-_list_all_pkgs() {
-    if command -v pacman >/dev/null 2>&1; then
-        pacman -Slq 2>/dev/null
-    elif command -v apt-cache >/dev/null 2>&1; then
-        apt-cache pkgnames 2>/dev/null | sort
-    elif command -v dnf >/dev/null 2>&1; then
-        dnf repoquery --qf '%{name}' 2>/dev/null
-    elif command -v apk >/dev/null 2>&1; then
-        apk search -q 2>/dev/null
-    elif command -v pkg >/dev/null 2>&1; then
-        pkg list-all 2>/dev/null | awk -F/ '{print $1}' | tail -n +3
-    fi
+# Detect package manager
+_detect_pkgmgr() {
+    for mgr in pacman apt dnf apk pkg; do
+        command -v "$mgr" >/dev/null 2>&1 && echo "$mgr" && return
+    done
+    echo "unknown"
 }
+PKG_MGR=$(_detect_pkgmgr)
 
+# Build package cache
 update_pkg_cache() {
-    if [[ ! -f "$PKG_CACHE" ]] || [[ $(find "$PKG_CACHE" -mmin +1440 2>/dev/null) ]]; then
-        _list_all_pkgs > "$PKG_CACHE.tmp" && mv "$PKG_CACHE.tmp" "$PKG_CACHE"
-    fi
+    case "$PKG_MGR" in
+        pacman) pacman -Slq > "$PKG_CACHE" 2>/dev/null ;;
+        apt)    apt-cache pkgnames > "$PKG_CACHE" 2>/dev/null ;;
+        dnf)    dnf list all -q | awk '{print $1}' > "$PKG_CACHE" 2>/dev/null ;;
+        apk)    apk search -q > "$PKG_CACHE" 2>/dev/null ;;
+        pkg)    pkg list-all | awk -F/ '{print $1}' > "$PKG_CACHE" 2>/dev/null ;;
+    esac
 }
 
-# Escanear qué binarios del tool_registry están instalados en PATH
+# Build tools cache
 update_tools_cache() {
-    if [[ ! -f "$TOOLS_CACHE" ]] || [[ $(find "$TOOLS_CACHE" -mmin +60 2>/dev/null) ]]; then
-        jq -r 'keys[]' "$TOOL_REGISTRY" | while read bin; do
-            command -v "$bin" >/dev/null 2>&1 && echo "$bin"
-        done > "$TOOLS_CACHE.tmp" && mv "$TOOLS_CACHE.tmp" "$TOOLS_CACHE"
-    fi
+    jq -r 'keys[]' "$TOOL_REGISTRY" | while read -r bin; do
+        command -v "$bin" >/dev/null 2>&1 && echo "$bin"
+    done > "$TOOLS_CACHE"
 }
 
+# Initial build
+update_pkg_cache
+update_tools_cache
+
+# Loop
 while true; do
-    update_tools_cache
-    update_pkg_cache
     sleep 3600
+    update_tools_cache
+    # Update pkg cache once a day
+    [[ $(date +%H) == "00" ]] && update_pkg_cache
 done

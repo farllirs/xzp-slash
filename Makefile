@@ -2,54 +2,60 @@
 
 PREFIX ?= /usr
 DESTDIR ?=
+SUDO ?= 
 BINDIR = $(DESTDIR)$(PREFIX)/bin
 LIBDIR = $(DESTDIR)$(PREFIX)/lib/slash
 SHAREDIR = $(DESTDIR)$(PREFIX)/share/slash
-ETCDIR = $(DESTDIR)/etc/slash
+
+# Detect if we are in Termux for ETCDIR
+ifeq ($(shell [ -d /data/data/com.termux ] && echo termux),termux)
+	ETCDIR = $(DESTDIR)$(PREFIX)/etc/slash
+else
+	ETCDIR = $(DESTDIR)/etc/slash
+endif
 
 all:
 	@echo "Nothing to build. Use 'make install' to install."
 
 install:
 	# Create directories
-	mkdir -p $(BINDIR)
-	mkdir -p $(LIBDIR)
-	mkdir -p $(SHAREDIR)/completions
-	mkdir -p $(SHAREDIR)/icons
-	mkdir -p $(ETCDIR)
+	$(SUDO) mkdir -p $(BINDIR)
+	$(SUDO) mkdir -p $(LIBDIR)
+	$(SUDO) mkdir -p $(SHAREDIR)/completions
+	$(SUDO) mkdir -p $(SHAREDIR)/icons
+	$(SUDO) mkdir -p $(ETCDIR)
 
 	# Install binaries
-	install -m 755 bin/slash $(BINDIR)/slash
-	install -m 755 bin/slash-daemon $(BINDIR)/slash-daemon
-	install -m 755 bin/slash-health $(BINDIR)/slash-health
-	install -m 755 bin/slash-run $(BINDIR)/slash-run
-	install -m 755 bin/slash-task $(BINDIR)/slash-task
+	$(SUDO) install -m 755 bin/slash $(BINDIR)/slash
+	$(SUDO) install -m 755 bin/slash-daemon $(BINDIR)/slash-daemon
+	$(SUDO) install -m 755 bin/slash-health $(BINDIR)/slash-health
+	$(SUDO) install -m 755 bin/slash-run $(BINDIR)/slash-run
+	$(SUDO) install -m 755 bin/slash-task $(BINDIR)/slash-task
 
 	# Install library
-	install -m 644 lib/slash.py $(LIBDIR)/slash.py
-	install -m 644 lib/slash-env.sh $(LIBDIR)/slash-env.sh
+	$(SUDO) install -m 644 lib/slash.py $(LIBDIR)/slash.py
+	$(SUDO) install -m 644 lib/slash-env.sh $(LIBDIR)/slash-env.sh
 
 	# Install completions
-	install -m 644 completions/bash_widget.sh $(SHAREDIR)/completions/
-	install -m 644 completions/zsh_widget.zsh $(SHAREDIR)/completions/
-	install -m 644 completions/pkg_completion.zsh $(SHAREDIR)/completions/
+	$(SUDO) install -m 644 completions/bash_widget.sh $(SHAREDIR)/completions/
+	$(SUDO) install -m 644 completions/zsh_widget.zsh $(SHAREDIR)/completions/
+	$(SUDO) install -m 644 completions/pkg_completion.zsh $(SHAREDIR)/completions/
 
 	# Install icons
-	cp -r icons/* $(SHAREDIR)/icons/
+	$(SUDO) cp -r icons/* $(SHAREDIR)/icons/
 
 	# Install default config (don't overwrite if exists)
-	test -f $(ETCDIR)/commands.json || install -m 644 config/commands.json $(ETCDIR)/
-	test -f $(ETCDIR)/settings.json || install -m 644 config/settings.example.json $(ETCDIR)/settings.json
-	test -f $(ETCDIR)/tool_registry.json || install -m 644 config/tool_registry.json $(ETCDIR)/
+	$(SUDO) test -f $(ETCDIR)/commands.json || $(SUDO) install -m 644 config/commands.json $(ETCDIR)/
+	$(SUDO) test -f $(ETCDIR)/settings.json || $(SUDO) install -m 644 config/settings.example.json $(ETCDIR)/settings.json
+	$(SUDO) test -f $(ETCDIR)/tool_registry.json || $(SUDO) install -m 644 config/tool_registry.json $(ETCDIR)/
 
 uninstall:
-	rm -f $(BINDIR)/slash
-	rm -f $(BINDIR)/slash-daemon
-	rm -f $(BINDIR)/slash-health
-	rm -f $(BINDIR)/slash-run
-	rm -f $(BINDIR)/slash-task
-	rm -rf $(LIBDIR)
-	rm -rf $(SHAREDIR)
-	# We leave /etc/slash to avoid losing user config unless specified
+	$(SUDO) rm -f $(BINDIR)/slash
+	$(SUDO) rm -f $(BINDIR)/slash-daemon
+	$(SUDO) rm -f $(BINDIR)/slash-health
+	$(SUDO) rm -f $(BINDIR)/slash-run
+	$(SUDO) rm -f $(BINDIR)/slash-task
+	$(SUDO) rm -rf $(LIBDIR)
+	$(SUDO) rm -rf $(SHAREDIR)
 
 .PHONY: all install uninstall

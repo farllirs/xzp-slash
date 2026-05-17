@@ -20,7 +20,7 @@ MODE_OUT="$BASE_TMP/slash_mode_result"
 
 # Detectar entorno
 _detect_env() {
-    [[ -n "$TERMUX_VERSION" || -d "/data/data/com.termux" ]] && echo "termux" && return
+    [[ "$IS_TERMUX" == true ]] && echo "termux" && return
     [[ -f /etc/arch-release ]]    && echo "arch"   && return
     [[ -f /etc/debian_version ]]  && echo "debian" && return
     [[ -f /etc/fedora-release ]]  && echo "fedora" && return
@@ -38,10 +38,6 @@ _detect_pkgmgr() {
 
 CURRENT_ENV=$(_detect_env)
 PKG_MGR=$(_detect_pkgmgr)
-
-# El bash_widget.sh lee settings.json en runtime para activar/desactivar el bind
-# No necesita modificar .bashrc — el source siempre está presente
-_sync_bash_widget() { return; }
 
 # 1. Menú de Configuración
 show_config() {
@@ -80,7 +76,6 @@ show_config() {
             wcurrent=$(jq -r '.widget_enabled // false' "$SETTINGS_JSON")
             wnext="true"; [[ "$wcurrent" == "true" ]] && wnext="false"
             jq ".widget_enabled = $wnext" "$SETTINGS_JSON" > "${SETTINGS_JSON}.tmp" && mv "${SETTINGS_JSON}.tmp" "$SETTINGS_JSON"
-            _sync_bash_widget
             echo "Widget / set to: $wnext (Restart shell to apply)"
             ;;
         "Edit commands.json") ${EDITOR:-nano} "$COMMANDS_JSON" ;;
