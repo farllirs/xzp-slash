@@ -3,27 +3,25 @@
 # Resolve slash-env.sh
 _slash_load_env() {
     local self_dir="${${(%):-%x}:A:h}"
-    if [[ -f "$self_dir/../../lib/slash-env.sh" ]]; then
-        source "$self_dir/../../lib/slash-env.sh"
-    elif [[ -f "/usr/lib/slash/slash-env.sh" ]]; then
-        source "/usr/lib/slash/slash-env.sh"
-    elif [[ -f "/data/data/com.termux/files/usr/lib/slash/slash-env.sh" ]]; then
-        source "/data/data/com.termux/files/usr/lib/slash/slash-env.sh"
-    fi
+    local paths=(
+        "$self_dir/../../lib/slash-env.sh"
+        "$PREFIX/lib/slash/slash-env.sh"
+        "/data/data/com.termux/files/usr/lib/slash/slash-env.sh"
+        "/usr/lib/slash/slash-env.sh"
+    )
+    for p in "${paths[@]}"; do
+        if [[ -f "$p" ]]; then source "$p"; return 0; fi
+    done
 }
 _slash_load_env
 
 xzp-slash-widget() {
-    # Check if widget is enabled in settings.json
-    if [[ -f "$SETTINGS_JSON" ]]; then
-        local enabled=$(jq -r '.widget_enabled // false' "$SETTINGS_JSON")
-        if [[ "$enabled" != "true" ]]; then
-            LBUFFER+="/"
-            return
-        fi
+    local enabled=$(jq -r '.widget_enabled // false' "$SETTINGS_JSON" 2>/dev/null)
+    if [[ "$enabled" != "true" ]]; then
+        LBUFFER+="/"
+        return
     fi
 
-    # Buffer empty -> menu
     if [[ -z "$BUFFER" ]]; then
         local base_tmp="${TMPDIR:-/tmp}"
         local cmd_out="$base_tmp/slash_cmd_result"
@@ -35,14 +33,8 @@ xzp-slash-widget() {
         if [[ -f "$cmd_out" ]]; then
             local cmd=$(cat "$cmd_out")
             local mode=$(cat "$mode_out")
-            
-            if [[ "$mode" == "2" ]]; then
-                BUFFER="$cmd"
-                zle accept-line
-            else
-                BUFFER="$cmd"
-                CURSOR=${#BUFFER}
-            fi
+            BUFFER="$cmd"
+            [[ "$mode" == "2" ]] && zle accept-line || CURSOR=${#BUFFER}
         fi
     else
         LBUFFER+="/"
@@ -51,7 +43,5 @@ xzp-slash-widget() {
 
 zle -N xzp-slash-widget
 bindkey "/" xzp-slash-widget
-
-# Aliases
 alias slash="$SLASH_BIN/slash-run"
 alias xzp-slash="$SLASH_BIN/slash-run"

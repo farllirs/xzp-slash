@@ -2,54 +2,30 @@
 
 # --- xzp-slash: Core Logic ---
 # Resolve paths
-SELF_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-if [[ -f "$SELF_DIR/../lib/slash-env.sh" ]]; then
-    source "$SELF_DIR/../lib/slash-env.sh"
-elif [[ -f "/usr/lib/slash/slash-env.sh" ]]; then
-    source "/usr/lib/slash/slash-env.sh"
-elif [[ -f "/data/data/com.termux/files/usr/lib/slash/slash-env.sh" ]]; then
-    source "/data/data/com.termux/files/usr/lib/slash/slash-env.sh"
-else
-    echo "Error: slash-env.sh not found."
-    exit 1
-fi
+_slash_load_env() {
+    local self_dir="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+    local paths=("$self_dir/../lib/slash-env.sh" "$PREFIX/lib/slash/slash-env.sh" "/data/data/com.termux/files/usr/lib/slash/slash-env.sh" "/usr/lib/slash/slash-env.sh")
+    for p in "${paths[@]}"; do [[ -f "$p" ]] && source "$p" && return 0; done
+    echo "Error: slash-env.sh not found." && exit 1
+}
+_slash_load_env
 
 BASE_TMP="${TMPDIR:-/tmp}"
 CMD_OUT="$BASE_TMP/slash_cmd_result"
 MODE_OUT="$BASE_TMP/slash_mode_result"
 
-# Detectar entorno
-_detect_env() {
-    [[ "$IS_TERMUX" == true ]] && echo "termux" && return
-    [[ -f /etc/arch-release ]]    && echo "arch"   && return
-    [[ -f /etc/debian_version ]]  && echo "debian" && return
-    [[ -f /etc/fedora-release ]]  && echo "fedora" && return
-    [[ -f /etc/alpine-release ]]  && echo "alpine" && return
-    echo "linux"
-}
-
-# Detectar gestor de paquetes
-_detect_pkgmgr() {
-    for mgr in pacman apt dnf apk pkg; do
-        command -v "$mgr" >/dev/null 2>&1 && echo "$mgr" && return
-    done
-    echo "unknown"
-}
-
-CURRENT_ENV=$(_detect_env)
-PKG_MGR=$(_detect_pkgmgr)
-
-# Helper to save settings safely
+# Helper to save settings safely (Always prefer user config)
 _save_settings() {
-    local tmp_file="${SETTINGS_JSON}.tmp"
-    if jq "$1" "$SETTINGS_JSON" > "$tmp_file" 2>/dev/null; then
-        # If we are editing global config without being root, we might need sudo
-        if [[ ! -w "$SETTINGS_JSON" ]]; then
-            $SUDO mv "$tmp_file" "$SETTINGS_JSON"
-        else
-            mv "$tmp_file" "$SETTINGS_JSON"
-        fi
-        return 0
+    local target="$SETTINGS_JSON"
+    # If we are using global config and it's not writable, try to create user config
+    if [[ "$target" == "$SLASH_ETC/settings.json" && ! -w "$target" ]]; then
+        target="$SLASH_USER_CONFIG/settings.json"
+        [[ ! -f "$target" ]] && cp "$SLASH_ETC/settings.json" "$target" 2>/dev/null
+    fi
+    
+    local tmp_file="${target}.tmp"
+    if jq "$1" "$target" > "$tmp_file" 2>/dev/null; then
+        mv "$tmp_file" "$target" && SETTINGS_JSON="$target" && return 0
     fi
     return 1
 }
@@ -57,42 +33,26 @@ _save_settings() {
 # 1. Menú de Configuración
 show_config() {
     local choice
-    local widget_state
-    widget_state=$(jq -r '.widget_enabled // false' "$SETTINGS_JSON" 2>/dev/null)
-    local widget_label="Toggle / Widget (actualmente: OFF)"
-    [[ "$widget_state" == "true" ]] && widget_label="Toggle / Widget (actualmente: ON)"
+    local widget_state=$(jq -r '.widget_enabled // false' "$SETTINGS_JSON" 2>/dev/null)
+    local widget_label="Toggle / Widget (actualmente: $( [[ "$widget_state" == "true" ]] && echo "ON" || echo "OFF" ))"
 
     choice=$(printf "UI Mode (Auto/Rich/Safe)\nExecution Mode (Paste/Auto/Interactive)\nToggle Auto-completion (ON/OFF)\n$widget_label\nEdit commands.json\nView System Health" \
         | fzf --prompt="Config / " --layout=reverse --height=40% --border)
     case "$choice" in
         "UI Mode"*)
-            local mode
-            mode=$(printf "auto\nrich\nsafe" | fzf --prompt="Select UI Mode / " --layout=reverse --height=20%)
-            [[ -n "$mode" ]] && _save_settings ".ui_mode = \"$mode\""
-            ;;
+            local mode=$(printf "auto\nrich\nsafe" | fzf --prompt="Select UI Mode / " --layout=reverse --height=20%)
+            [[ -n "$mode" ]] && _save_settings ".ui_mode = \"$mode\"" ;;
         "Execution Mode"*)
-            local emode
-            emode=$(printf "1. Manual (Paste only)\n2. Automatic (Direct execute)\n3. Interactive (Prompt for params)" \
-                | fzf --prompt="Select Execution Mode / " --layout=reverse --height=25%)
-            if [[ -n "$emode" ]]; then
-                local emode_val="${emode%%.*}"
-                _save_settings ".execution_mode = $emode_val"
-            fi
-            ;;
+            local emode=$(printf "1. Manual (Paste only)\n2. Automatic (Direct execute)\n3. Interactive (Prompt for params)" | fzf --prompt="Select Execution Mode / " --layout=reverse --height=25%)
+            [[ -n "$emode" ]] && _save_settings ".execution_mode = ${emode%%.*}" ;;
         "Toggle Auto-completion"*)
-            local current next_val
-            current=$(jq -r '.completion_enabled // true' "$SETTINGS_JSON" 2>/dev/null)
-            next_val="true"; [[ "$current" == "true" ]] && next_val="false"
-            _save_settings ".completion_enabled = $next_val"
-            echo "Auto-completion set to: $next_val"
-            ;;
+            local current=$(jq -r '.completion_enabled // true' "$SETTINGS_JSON" 2>/dev/null)
+            local next_val="true"; [[ "$current" == "true" ]] && next_val="false"
+            _save_settings ".completion_enabled = $next_val" && echo "Auto-completion set to: $next_val" ;;
         "Toggle / Widget"*)
-            local wcurrent wnext
-            wcurrent=$(jq -r '.widget_enabled // false' "$SETTINGS_JSON" 2>/dev/null)
-            wnext="true"; [[ "$wcurrent" == "true" ]] && wnext="false"
-            _save_settings ".widget_enabled = $wnext"
-            echo "Widget / set to: $wnext"
-            ;;
+            local wcurrent=$(jq -r '.widget_enabled // false' "$SETTINGS_JSON" 2>/dev/null)
+            local wnext="true"; [[ "$wcurrent" == "true" ]] && wnext="false"
+            _save_settings ".widget_enabled = $wnext" && echo "Widget / set to: $wnext" ;;
         "Edit commands.json") ${EDITOR:-nano} "$COMMANDS_JSON" ;;
         "View System Health") "$SLASH_BIN/slash-health" ;;
     esac
@@ -100,127 +60,65 @@ show_config() {
 }
 
 # Manejar argumentos
-if [[ "$1" == "--conf" || "$1" == "-c" ]]; then
-    show_config
+if [[ "$1" == "--conf" || "$1" == "-c" ]]; then show_config
 elif [[ "$1" == "--packages" ]]; then
-    if [[ -f "$PKG_CACHE" ]]; then
-        SELECTED_PKG=$(fzf --prompt="Package Search > " --height=50% --layout=reverse --border < "$PKG_CACHE")
-        if [[ -n "$SELECTED_PKG" ]]; then
-            echo "$SELECTED_PKG" > "$CMD_OUT"
-            echo "1" > "$MODE_OUT"
-            exit 0
-        fi
-    fi
+    [[ -f "$PKG_CACHE" ]] && SELECTED_PKG=$(fzf --prompt="Package Search > " --height=50% --layout=reverse --border < "$PKG_CACHE")
+    [[ -n "$SELECTED_PKG" ]] && echo "$SELECTED_PKG" > "$CMD_OUT" && echo "1" > "$MODE_OUT" && exit 0
     exit 1
 fi
 
 # 2. Configuración de UI
 UI_PREF=$(jq -r '.ui_mode // "auto"' "$SETTINGS_JSON" 2>/dev/null)
 EXEC_MODE=$(jq -r '.execution_mode // 1' "$SETTINGS_JSON" 2>/dev/null)
+CURRENT_ENV=$([[ "$IS_TERMUX" == true ]] && echo "termux" || echo "linux")
 
 USE_ICONS=false
-if [[ "$UI_PREF" == "rich" ]]; then
-    USE_ICONS=true
-elif [[ "$UI_PREF" == "auto" && ( "$TERM" == "xterm-256color" || "$COLORTERM" == "truecolor" ) ]]; then
-    USE_ICONS=true
-fi
+[[ "$UI_PREF" == "rich" ]] && USE_ICONS=true
+[[ "$UI_PREF" == "auto" && ( "$TERM" == "xterm-256color" || "$COLORTERM" == "truecolor" ) ]] && USE_ICONS=true
 
 if [[ "$USE_ICONS" == true ]]; then
-    ICON_PROMPT="󰘳"
-    ICON_GLOBAL=$'\033[1;34m[GLOBAL]\033[0m'
-    ICON_LOCAL=$'\033[1;32m[LOCAL]\033[0m'
-    ICON_TOOL=$'\033[1;30m[TOOL]\033[0m'
-    ICON_ENV=$'\033[1;35m['"${CURRENT_ENV^^}"$']\033[0m'
+    ICON_PROMPT="󰘳"; ICON_GLOBAL=$'\033[1;34m[GLOBAL]\033[0m'; ICON_LOCAL=$'\033[1;32m[LOCAL]\033[0m'; ICON_TOOL=$'\033[1;30m[TOOL]\033[0m'; ICON_ENV=$'\033[1;35m['"${CURRENT_ENV^^}"$']\033[0m'
     FZF_COLORS="border:#44475a,header:#bd93f9,prompt:#50fa7b,pointer:#ff79c6,marker:#ff79c6,hl:#ffb86c,hl+:#ffb86c"
 else
-    ICON_PROMPT=">>"
-    ICON_GLOBAL=$'\033[34;1m[G]\033[0m'
-    ICON_LOCAL=$'\033[32;1m[L]\033[0m'
-    ICON_TOOL=$'\033[30;1m[T]\033[0m'
-    ICON_ENV=$'\033[35;1m['"${CURRENT_ENV^^}"$']\033[0m'
+    ICON_PROMPT=">>"; ICON_GLOBAL=$'\033[34;1m[G]\033[0m'; ICON_LOCAL=$'\033[32;1m[L]\033[0m'; ICON_TOOL=$'\033[30;1m[T]\033[0m'; ICON_ENV=$'\033[35;1m['"${CURRENT_ENV^^}"$']\033[0m'
     FZF_COLORS="border:blue,header:magenta,prompt:green,pointer:cyan,marker:cyan,hl:yellow,hl+:yellow"
 fi
 
-case "$EXEC_MODE" in
-    1) EXEC_TAG=$'\033[1;31m[MODE: PASTE ONLY]\033[0m' ;;
-    2) EXEC_TAG=$'\033[1;31m[MODE: AUTO EXECUTE]\033[0m' ;;
-    3) EXEC_TAG=$'\033[1;31m[MODE: INTERACTIVE]\033[0m' ;;
-esac
-
-# 3. Detección de contexto local
-LOCAL_CONTEXTS=()
-[[ -d .git ]]                          && LOCAL_CONTEXTS+=("git")
-[[ -f package.json ]]                  && LOCAL_CONTEXTS+=("node")
-[[ -n "$(ls *.py 2>/dev/null)" ]]      && LOCAL_CONTEXTS+=("python")
-
-# Herramientas detectadas (desde caché del daemon o generadas al vuelo)
-if [[ -f "$TOOLS_CACHE" ]]; then
-    mapfile -t DETECTED_TOOLS < "$TOOLS_CACHE"
-else
-    mapfile -t DETECTED_TOOLS < <(jq -r 'keys[]' "$TOOL_REGISTRY" 2>/dev/null | while read -r bin; do
-        command -v "$bin" >/dev/null 2>&1 && echo "$bin"
-    done)
-fi
-
-# 4. Construir lista de comandos
+# 3. Construir lista de comandos
 LIST=""
-
-# Contexto local primero (mayor prioridad)
-for ctx in "${LOCAL_CONTEXTS[@]}"; do
+# Contexto local
+[[ -d .git ]] && ctxs+=("git"); [[ -f package.json ]] && ctxs+=("node"); [[ -n "$(ls *.py 2>/dev/null)" ]] && ctxs+=("python")
+for ctx in "${ctxs[@]}"; do
     EXTRACTED=$(jq -r ".contextual.\"$ctx\"[]? | \"\(.cmd) | \(.desc) | LOCAL\"" "$COMMANDS_JSON" 2>/dev/null | sed "s/LOCAL$/$ICON_LOCAL/")
     [[ -n "$EXTRACTED" ]] && LIST="$EXTRACTED${LIST:+$'\n'$LIST}"
 done
-
-# Comandos globales
-GLOBAL=$(jq -r '.global[] | "\(.cmd) | \(.desc) | GLOBAL"' "$COMMANDS_JSON" 2>/dev/null | sed "s/GLOBAL$/$ICON_GLOBAL/")
-LIST="${LIST:+$LIST$'\n'}$GLOBAL"
-
-# Herramientas detectadas en PATH (del tool_registry, agnósticas al entorno)
-for tool in "${DETECTED_TOOLS[@]}"; do
-    EXTRACTED=$(jq -r ".\"$tool\"[]? | \"\(.cmd) | \(.desc) | TOOL\"" "$TOOL_REGISTRY" 2>/dev/null | sed "s/TOOL$/$ICON_TOOL/")
-    [[ -n "$EXTRACTED" ]] && LIST="$LIST"$'\n'"$EXTRACTED"
-done
-
-# Solo comandos del entorno actual — excluye todas las demás distros
+# Globales y Herramientas
+LIST="${LIST:+$LIST$'\n'}$(jq -r '.global[] | "\(.cmd) | \(.desc) | GLOBAL"' "$COMMANDS_JSON" 2>/dev/null | sed "s/GLOBAL$/$ICON_GLOBAL/")"
+if [[ -f "$TOOLS_CACHE" ]]; then
+    while read -r tool; do
+        EXTRACTED=$(jq -r ".\"$tool\"[]? | \"\(.cmd) | \(.desc) | TOOL\"" "$TOOL_REGISTRY" 2>/dev/null | sed "s/TOOL$/$ICON_TOOL/")
+        [[ -n "$EXTRACTED" ]] && LIST="$LIST"$'\n'"$EXTRACTED"
+    done < "$TOOLS_CACHE"
+fi
+# Entorno
 ENV_CMDS=$(jq -r ".contextual.\"$CURRENT_ENV\"[]? | \"\(.cmd) | \(.desc) | ENV\"" "$COMMANDS_JSON" 2>/dev/null | sed "s/ENV$/$ICON_ENV/")
 [[ -n "$ENV_CMDS" ]] && LIST="$LIST"$'\n'"$ENV_CMDS"
 
-# 5. Interfaz FZF
-SELECTED=$(echo -e "$LIST" | fzf --ansi \
-    --prompt="$ICON_PROMPT slash / " \
-    --header="$EXEC_TAG | ENV: $CURRENT_ENV | PKG: $PKG_MGR | LOCAL: ${LOCAL_CONTEXTS[*]:-none}" \
-    --delimiter=" | " --with-nth=1,2,3 \
-    --height=50% --layout=reverse --border \
-    --preview "echo {2}" --preview-window=bottom:1:wrap \
-    --color="$FZF_COLORS")
+# 4. Interfaz FZF
+SELECTED=$(echo -e "$LIST" | fzf --ansi --prompt="$ICON_PROMPT slash / " --header="MODE: $EXEC_MODE | ENV: $CURRENT_ENV" --delimiter=" | " --with-nth=1,2,3 --height=50% --layout=reverse --border --preview "echo {2}" --preview-window=bottom:1:wrap --color="$FZF_COLORS")
 
-# 6. Procesamiento
+# 5. Procesamiento
 if [[ -n "$SELECTED" ]]; then
     CMD=$(echo "$SELECTED" | awk -F ' | ' '{print $1}')
-    [[ "$CMD" == "slash-task" ]]   && CMD="$SLASH_BIN/slash-task"
+    [[ "$CMD" == "slash-task" ]] && CMD="$SLASH_BIN/slash-task"
     [[ "$CMD" == "slash-health" ]] && CMD="$SLASH_BIN/slash-health"
-
-    # Resolver placeholders <param>
-    if [[ "$EXEC_MODE" -eq 3 || "$CMD" == *"<"*">"* ]]; then
-        while [[ "$CMD" =~ \<([^\>]+)\> ]]; do
-            placeholder="${BASH_REMATCH[0]}"
-            clean_ph="${BASH_REMATCH[1]}"
-            echo -e "\n\033[1;33mVariable required: $clean_ph\033[0m"
-            local val=""
-            if [[ "$clean_ph" =~ ^(path|folder|src|dest|directory)$ ]]; then
-                val=$(find . -maxdepth 3 -type d -not -path '*/.*' 2>/dev/null \
-                    | fzf --prompt="Select $clean_ph > " --height=40% --layout=reverse --border)
-            else
-                read -rp "Enter value for $clean_ph: " val
-            fi
-            [[ -z "$val" ]] && echo "Cancelled." && exit 1
-            CMD="${CMD//$placeholder/$val}"
-        done
-    fi
-
-    echo "$CMD" > "$CMD_OUT"
-    echo "$EXEC_MODE" > "$MODE_OUT"
-    echo "$CMD"   # stdout para widgets
+    # Placeholders
+    while [[ "$CMD" =~ \<([^\>]+)\> ]]; do
+        placeholder="${BASH_REMATCH[0]}"; clean_ph="${BASH_REMATCH[1]}"
+        val=$(read -rp "Enter value for $clean_ph: " v && echo "$v")
+        [[ -z "$val" ]] && exit 1 || CMD="${CMD//$placeholder/$val}"
+    done
+    echo "$CMD" > "$CMD_OUT" && echo "$EXEC_MODE" > "$MODE_OUT" && echo "$CMD"
     exit 0
 fi
 exit 1
