@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# install.sh — xzp-slash official installer (v2.2)
+# install.sh — xzp-slash official installer (v2.3)
 
 # ── Colores ────────────────────────────────────────────────────────────────
 R=$'\033[1;31m' G=$'\033[1;32m' Y=$'\033[1;33m' B=$'\033[1;34m' C=$'\033[1;36m' N=$'\033[0m'
@@ -87,6 +87,9 @@ fi
 
 # ── Configuración de Shell ─────────────────────────────────────────────────
 _hdr "Configurando shells"
+# Ensure user config dir exists
+mkdir -p "$HOME/.config/slash"
+
 SHELLS=()
 [[ -f "$HOME/.bashrc" ]] && SHELLS+=("bash:$HOME/.bashrc")
 [[ -f "$HOME/.zshrc" ]]  && SHELLS+=("zsh:$HOME/.zshrc")
@@ -96,13 +99,13 @@ for entry in "${SHELLS[@]}"; do
     rc="${entry##*:}"
     
     if [[ "$shell" == "zsh" ]]; then
-        grep -q "zsh_widget.zsh" "$rc" || echo "source $PREFIX/share/slash/completions/zsh_widget.zsh" >> "$rc"
-        grep -q "pkg_completion.zsh" "$rc" || echo "source $PREFIX/share/slash/completions/pkg_completion.zsh" >> "$rc"
+        grep -q "zsh_widget.zsh" "$rc" || echo "[[ -f $PREFIX/share/slash/completions/zsh_widget.zsh ]] && source $PREFIX/share/slash/completions/zsh_widget.zsh" >> "$rc"
+        grep -q "pkg_completion.zsh" "$rc" || echo "[[ -f $PREFIX/share/slash/completions/pkg_completion.zsh ]] && source $PREFIX/share/slash/completions/pkg_completion.zsh" >> "$rc"
         _ok "[zsh] configurado en $rc"
     fi
 
     if [[ "$shell" == "bash" ]]; then
-        grep -q "bash_widget.sh" "$rc" || echo "source $PREFIX/share/slash/completions/bash_widget.sh" >> "$rc"
+        grep -q "bash_widget.sh" "$rc" || echo "[[ -f $PREFIX/share/slash/completions/bash_widget.sh ]] && source $PREFIX/share/slash/completions/bash_widget.sh" >> "$rc"
         _ok "[bash] configurado en $rc"
     fi
 done
@@ -122,5 +125,5 @@ fi
 
 _hdr "Instalación completada"
 _ok "Usa el comando: ${Y}slash${N}"
-_info "Reinicia tu terminal para activar los widgets"
+_info "Reinicia tu terminal o ejecuta: ${Y}source ~/.bashrc${N} (o ~/.zshrc)"
 echo
