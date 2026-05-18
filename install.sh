@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# install.sh — xzp-slash official installer (v2.1)
+# install.sh — xzp-slash official installer (v2.2)
 
 # ── Colores ────────────────────────────────────────────────────────────────
 R=$'\033[1;31m' G=$'\033[1;32m' Y=$'\033[1;33m' B=$'\033[1;34m' C=$'\033[1;36m' N=$'\033[0m'
@@ -56,7 +56,7 @@ _install_pkg() {
 }
 
 _hdr "Dependencias"
-DEPS=(fzf jq python3 make coreutils grep sed awk)
+DEPS=(fzf jq python3 make coreutils grep sed awk git)
 [[ "$IS_TERMUX" == true ]] && DEPS+=(which)
 
 for dep in "${DEPS[@]}"; do
@@ -68,9 +68,22 @@ for dep in "${DEPS[@]}"; do
     fi
 done
 
+# ── Descargar código si no existe ──────────────────────────────────────────
+if [[ ! -f "Makefile" ]]; then
+    _hdr "Descargando código"
+    TEMP_DIR=$(mktemp -d)
+    git clone https://github.com/farllirs/xzp-slash.git "$TEMP_DIR"
+    cd "$TEMP_DIR" || { _err "No se pudo acceder al directorio temporal"; exit 1; }
+fi
+
 # ── Instalación vía Makefile ───────────────────────────────────────────────
 _hdr "Instalando archivos"
-make install PREFIX="$PREFIX" SUDO="$SUDO"
+if [[ -f "Makefile" ]]; then
+    make install PREFIX="$PREFIX" SUDO="$SUDO"
+else
+    _err "Error crítico: Makefile no encontrado."
+    exit 1
+fi
 
 # ── Configuración de Shell ─────────────────────────────────────────────────
 _hdr "Configurando shells"
