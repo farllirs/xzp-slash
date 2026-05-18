@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# install.sh — xzp-slash official installer (v2.3)
+# install.sh — xzp-slash official installer (v2.4)
 
 # ── Colores ────────────────────────────────────────────────────────────────
 R=$'\033[1;31m' G=$'\033[1;32m' Y=$'\033[1;33m' B=$'\033[1;34m' C=$'\033[1;36m' N=$'\033[0m'
@@ -87,28 +87,33 @@ fi
 
 # ── Configuración de Shell ─────────────────────────────────────────────────
 _hdr "Configurando shells"
-# Ensure user config dir exists
 mkdir -p "$HOME/.config/slash"
 
-SHELLS=()
-[[ -f "$HOME/.bashrc" ]] && SHELLS+=("bash:$HOME/.bashrc")
-[[ -f "$HOME/.zshrc" ]]  && SHELLS+=("zsh:$HOME/.zshrc")
+# Detect active shell
+CURRENT_SHELL=$(basename "$SHELL")
+RC_FILE=""
 
-for entry in "${SHELLS[@]}"; do
-    shell="${entry%%:*}"
-    rc="${entry##*:}"
-    
-    if [[ "$shell" == "zsh" ]]; then
-        grep -q "zsh_widget.zsh" "$rc" || echo "[[ -f $PREFIX/share/slash/completions/zsh_widget.zsh ]] && source $PREFIX/share/slash/completions/zsh_widget.zsh" >> "$rc"
-        grep -q "pkg_completion.zsh" "$rc" || echo "[[ -f $PREFIX/share/slash/completions/pkg_completion.zsh ]] && source $PREFIX/share/slash/completions/pkg_completion.zsh" >> "$rc"
-        _ok "[zsh] configurado en $rc"
-    fi
+case "$CURRENT_SHELL" in
+    bash) RC_FILE="$HOME/.bashrc" ;;
+    zsh)  RC_FILE="$HOME/.zshrc" ;;
+    *)    RC_FILE="$HOME/.bashrc" ;; # Default to bashrc
+esac
 
-    if [[ "$shell" == "bash" ]]; then
-        grep -q "bash_widget.sh" "$rc" || echo "[[ -f $PREFIX/share/slash/completions/bash_widget.sh ]] && source $PREFIX/share/slash/completions/bash_widget.sh" >> "$rc"
-        _ok "[bash] configurado en $rc"
-    fi
-done
+# Create RC file if it doesn't exist
+if [[ ! -f "$RC_FILE" ]]; then
+    touch "$RC_FILE"
+    _ok "Creado archivo de configuración: $RC_FILE"
+fi
+
+# Add configuration to the detected RC file
+if [[ "$RC_FILE" == *".zshrc" ]]; then
+    grep -q "zsh_widget.zsh" "$RC_FILE" || echo "[[ -f $PREFIX/share/slash/completions/zsh_widget.zsh ]] && source $PREFIX/share/slash/completions/zsh_widget.zsh" >> "$RC_FILE"
+    grep -q "pkg_completion.zsh" "$RC_FILE" || echo "[[ -f $PREFIX/share/slash/completions/pkg_completion.zsh ]] && source $PREFIX/share/slash/completions/pkg_completion.zsh" >> "$RC_FILE"
+    _ok "[zsh] configurado en $RC_FILE"
+else
+    grep -q "bash_widget.sh" "$RC_FILE" || echo "[[ -f $PREFIX/share/slash/completions/bash_widget.sh ]] && source $PREFIX/share/slash/completions/bash_widget.sh" >> "$RC_FILE"
+    _ok "[bash] configurado en $RC_FILE"
+fi
 
 # ── Iniciar Daemon ─────────────────────────────────────────────────────────
 _hdr "Iniciando servicios"
@@ -125,5 +130,5 @@ fi
 
 _hdr "Instalación completada"
 _ok "Usa el comando: ${Y}slash${N}"
-_info "Reinicia tu terminal o ejecuta: ${Y}source ~/.bashrc${N} (o ~/.zshrc)"
+_info "Para activar ahora, ejecuta: ${Y}source $RC_FILE${N}"
 echo
