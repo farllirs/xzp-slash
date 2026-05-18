@@ -27,11 +27,7 @@ else
     # Global installation
     SLASH_BIN="$PREFIX/bin"
     SLASH_LIB="$PREFIX/lib/slash"
-    if [[ "$IS_TERMUX" == true ]]; then
-        SLASH_ETC="$PREFIX/etc/slash"
-    else
-        SLASH_ETC="/etc/slash"
-    fi
+    SLASH_ETC="/etc/slash"; [[ "$IS_TERMUX" == true ]] && SLASH_ETC="$PREFIX/etc/slash"
     SLASH_SHARE="$PREFIX/share/slash"
     SLASH_CACHE="$HOME/.cache/slash"
 fi
@@ -45,7 +41,10 @@ resolve_config() {
     local file=$1
     if [[ -f "$SLASH_USER_CONFIG/$file" ]]; then
         echo "$SLASH_USER_CONFIG/$file"
+    elif [[ -f "$SLASH_ETC/$file" ]]; then
+        echo "$SLASH_ETC/$file"
     else
+        # Fallback to global path even if file doesn't exist yet
         echo "$SLASH_ETC/$file"
     fi
 }
